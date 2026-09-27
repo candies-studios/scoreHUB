@@ -1,0 +1,22 @@
+# Supabase project configuration
+
+[project]
+# Project reference ID from Supabase dashboard
+project_id = "your-project-ref"
+
+# Database settings
+[db]
+major_version = 15
+
+# API settings
+[api]
+enabled = true
+
+# Real-time settings
+[realtime]
+enabled = true
+max_bytes_per_second = 1048576
+
+# Vector settings (optional)
+[vector]
+enabled = false

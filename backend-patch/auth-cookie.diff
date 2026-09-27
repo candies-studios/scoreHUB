@@ -1,0 +1,47 @@
+Apply to src/lib/auth.ts in the ScoreHUB repo.
+
+WHY: a cookie set with SameSite=Lax is not sent on cross-site requests. As long
+as the app and API shared an origin that was the right, safest setting. Once the
+front end lives on a different origin (GitHub Pages, Netlify, a custom domain)
+the browser silently drops the session cookie on every API call and the static
+site behaves as though nobody is signed in — no error, just 401s.
+
+SameSite=None re-enables it, and the browser only honours that together with
+Secure, which means the API must be served over HTTPS. This is a real widening:
+the cookie now travels on cross-site requests, so CORS (see middleware.ts) is
+what keeps other sites from using it. Do not set None without that middleware
+restricting Access-Control-Allow-Origin to origins you control.
+
+--- a/src/lib/auth.ts
++++ b/src/lib/auth.ts
+@@
+   const store = await cookies();
+   store.set(COOKIE_NAME, token, {
+     httpOnly: true,
+-    sameSite: 'lax',
+-    secure: process.env.NODE_ENV === 'production',
++    // Cross-site: the static front end is on a different origin to this API.
++    // 'none' requires 'secure', so the API has to be on HTTPS.
++    sameSite: CROSS_SITE ? 'none' : 'lax',
++    secure: CROSS_SITE || process.env.NODE_ENV === 'production',
+     path: '/',
+     maxAge: TTL,
+   });
+
+Add near the top of the same file, beside the other constants:
+
++/**
++ * Set CROSS_SITE_COOKIE=true when the front end is served from a different
++ * origin to this API. Leave it unset for the all-in-one Next.js deployment,
++ * which keeps the stricter SameSite=Lax.
++ */
++const CROSS_SITE = process.env.CROSS_SITE_COOKIE === 'true';
+
+Then set on the API host:
+
+  CROSS_SITE_COOKIE=true
+  ALLOWED_ORIGINS=https://vchandanshive34.github.io
+
+And on the realtime host, so the socket accepts the same origin:
+
+  ALLOWED_ORIGINS=https://vchandanshive34.github.io
