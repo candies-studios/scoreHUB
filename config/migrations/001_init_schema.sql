@@ -1,3 +1,10 @@
+-- ============================================================================
+-- SUPERSEDED — DO NOT RUN.
+-- ScoreHUB now uses the shared WDS database. The schema lives in the WDS repo:
+--   candies-studios/warriors-dream-series/supabase/migrations/
+-- Running this file would create conflicting tables. See SUPABASE-BRIDGE.md.
+-- ============================================================================
+
 -- ScoreHUB Initial Schema
 -- Run this in Supabase SQL Editor
 

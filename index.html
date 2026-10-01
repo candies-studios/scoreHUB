@@ -48,9 +48,20 @@ window.__SCOREHUB_CONFIG__ = {
   // true  = always demo, even with URLs set
   // false = never demo; show real connection errors instead
   // demo: false,
+
+  // ---- WDS shared database --------------------------------------------------
+  // With these two set, supabase-bridge.js connects ScoreHUB to the WDS
+  // Supabase project (events, fighters, bouts, scores, results, rankings).
+  // Remove them to go back to the in-browser mode. The anon key is public by
+  // design; Row Level Security in the database decides what each user can do.
+  supabaseUrl: 'https://qjqpquwcfarvyjzfzjcb.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqcXBxdXdjZmFydnlqemZ6amNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTE0NDIsImV4cCI6MjEwNTg4NzQ0Mn0.V747d27nDgWroNv2gafQborcxNhAIKpv4d6iZLFN4fA',
 };
 
 </script>
+    <!-- WDS shared database bridge (no rebuild of the app below). -->
+    <script src="vendor/supabase.js"></script>
+    <script src="supabase-bridge.js"></script>
     <script type="module">
 var th=Object.defineProperty;var nh=(e,t,n)=>t in e?th(e,t,{enumerable:!0,configurable:!0,writable:!0,value:n}):e[t]=n;var qn=(e,t,n)=>nh(e,typeof t!="symbol"?t+"":t,n);function rh(e,t){for(var n=0;n<t.length;n++){const r=t[n];if(typeof r!="string"&&!Array.isArray(r)){for(const s in r)if(s!=="default"&&!(s in e)){const i=Object.getOwnPropertyDescriptor(r,s);i&&Object.defineProperty(e,s,i.get?i:{enumerable:!0,get:()=>r[s]})}}}return Object.freeze(Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}))}(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))r(s);new MutationObserver(s=>{for(const i of s)if(i.type==="childList")for(const l of i.addedNodes)l.tagName==="LINK"&&l.rel==="modulepreload"&&r(l)}).observe(document,{childList:!0,subtree:!0});function n(s){const i={};return s.integrity&&(i.integrity=s.integrity),s.referrerPolicy&&(i.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?i.credentials="include":s.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function r(s){if(s.ep)return;s.ep=!0;const i=n(s);fetch(s.href,i)}})();function sh(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}var ec={exports:{}},li={},tc={exports:{}},I={};/**
  * @license React
