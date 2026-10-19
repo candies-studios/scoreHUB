@@ -1,27 +1,28 @@
 {
   "name": "scorehub",
-  "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "private": true,
+  "description": "ScoreHub — real-time combat sports league management and multi-judge live scoring platform (MMA / BJJ / K1).",
+  "license": "MIT",
+  "workspaces": [
+    "server",
+    "client"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.38.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "axios": "^1.6.0"
+    "dev": "concurrently -n server,client -c magenta,cyan \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm --workspace server run dev",
+    "dev:client": "npm --workspace client run dev",
+    "build": "npm --workspace client run build",
+    "start": "npm --workspace server run start",
+    "seed": "npm --workspace server run seed",
+    "test": "npm --workspace server run test",
+    "test:e2e": "npm --workspace server run test:e2e",
+    "lint": "npm --workspace client run lint"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@vitejs/plugin-react": "^4.2.0",
-    "eslint": "^8.54.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "vite": "^5.0.0"
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=18.18"
   }
 }
