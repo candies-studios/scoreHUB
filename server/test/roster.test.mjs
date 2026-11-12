@@ -103,15 +103,27 @@ t('the dataset splits into both past and upcoming leagues', () => {
   assert.ok(past.length > 0, 'nothing would show under Past League');
 });
 
-t('past events have completed bouts with results', () => {
-  const today = new Date().toISOString().slice(0, 10);
-  const pastIds = new Set(data.leagues.filter((l) => l.date < today).map((l) => l.id));
-  const pastBouts = data.bouts.filter((b) => pastIds.has(b.league));
-  assert.ok(pastBouts.length > 0, 'no bouts on past events');
-  assert.ok(
-    pastBouts.every((b) => b.result && b.result.winnerCorner && b.result.method),
-    'a past bout has no recorded result'
-  );
+t('an event has bouts if and only if its card was imported', () => {
+  const withBouts = new Set(data.bouts.map((b) => b.league));
+  for (const l of data.leagues) {
+    if (l.cardImported) {
+      assert.ok(withBouts.has(l.id), `${l.name} claims an imported card but has no bouts`);
+    } else {
+      assert.ok(!withBouts.has(l.id), `${l.name} has bouts but is not marked as imported`);
+    }
+  }
+});
+
+t('at least one real fight card is present', () => {
+  const imported = data.leagues.filter((l) => l.cardImported);
+  assert.ok(imported.length > 0, 'no fight card has been imported at all');
+  assert.ok(data.bouts.length >= 10, `only ${data.bouts.length} bouts imported`);
+});
+
+t('every event records where it came from', () => {
+  for (const l of data.leagues) {
+    assert.match(l.sourceUrl || '', /^https?:\/\//, `${l.name} has no source URL`);
+  }
 });
 
 t('upcoming events have no results yet', () => {
@@ -130,17 +142,26 @@ t('a result names a corner that exists', () => {
 
 /* ---------- photos ---------- */
 
-t('every fighter has a photo path following the documented convention', () => {
+t('every fighter has a usable photo', () => {
   for (const f of data.fighters) {
-    assert.match(f.photo, /^fighters\/[a-z0-9-]+\.jpg$/, `${f.name} has an odd photo path: ${f.photo}`);
+    assert.ok(f.photo, `${f.name} has no photo`);
+    const ok = /^https:\/\/wdsmma\.com\/assets\/images\/.+\.(webp|jpg|png|svg)$/.test(f.photo)
+      || /^fighters\/[a-z0-9-]+\.(jpg|png|webp)$/.test(f.photo);
+    assert.ok(ok, `${f.name} has an odd photo path: ${f.photo}`);
   }
 });
 
-t('photo paths are relative, so they resolve against the site not the API', () => {
+t('photos are never served from the API host', () => {
+  // A leading slash would be resolved against the API, which does not hold these.
   for (const f of data.fighters) {
     assert.ok(!f.photo.startsWith('/'), `${f.name} photo must not start with /`);
-    assert.ok(!/^https?:/.test(f.photo), `${f.name} photo must not be absolute`);
   }
+});
+
+t('real fighters are hotlinked from wdsmma.com', () => {
+  const real = data.fighters.filter((f) => !f.tba);
+  const hosted = real.filter((f) => f.photo.startsWith('https://wdsmma.com/'));
+  assert.ok(hosted.length > 0, 'no photos point at the live WDS site');
 });
 
 /**
@@ -150,8 +171,10 @@ t('photo paths are relative, so they resolve against the site not the API', () =
  * pointing at the same image.
  */
 t('a photo file maps to exactly one person', () => {
+  // TBA shares one placeholder image by design.
   const byPhoto = new Map();
   for (const f of data.fighters) {
+    if (f.tba) continue;
     if (!byPhoto.has(f.photo)) byPhoto.set(f.photo, new Set());
     byPhoto.get(f.photo).add(f.name);
   }
@@ -169,9 +192,7 @@ t('the same person reuses one photo across events', () => {
   for (const [name, photos] of byName) {
     assert.equal(photos.size, 1, `${name} points at ${photos.size} different photos`);
   }
-  // Confirm the repeat-appearance case is genuinely exercised by the data.
-  const repeats = [...byName.values()].length;
-  assert.ok(repeats < data.fighters.length, 'expected at least one fighter on two cards');
+
 });
 
 /* ---------- bout settings ---------- */

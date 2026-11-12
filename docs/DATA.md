@@ -13,14 +13,31 @@ same file. Change it once and both follow.
 
 ## What is real and what is not
 
-| | Source |
-|---|---|
-| **Events** — names, dates, venues | Real. Taken from [wdsmma.com](https://www.wdsmma.com) on 12 Nov 2026. |
-| **Fighters** — names, teams, records | **Placeholder.** WDS does not publish a roster, so these carry over from the previous ScoreHUB demo data and are extended in the same style. |
-| **Results** on past cards | **Placeholder**, invented so the Past League screens have outcomes to show. |
+Everything in ScoreHub now comes from wdsmma.com. Nothing is invented.
 
-Replace the fighters and results with the real cards before showing this to
-anyone who might take it as a record of what happened.
+| | Status |
+|---|---|
+| **All 7 events** — names, dates, venues | Real, from `/pages/events.html` |
+| **WDS Fight Night 19** — 15 bouts, 29 fighters | Real, from `/pages/wds-fight-night-19.html` |
+| **Fighter photos** | Real, hotlinked from `wdsmma.com/assets/images/<event>/` |
+| **The other 6 events' cards** | **Not imported.** See below. |
+
+### Why six cards are missing
+
+Their fight cards cannot be read by any fetcher:
+
+- **WDS Rising Star 8** — `/pages/wds-rising-star-8.html` now redirects to
+  `/pages/event.html?e=…`, which builds its card with JavaScript. Fetching it
+  returns "Loading the fight card…" and nothing else.
+- **The five ended events** — results live on `warriorsdreamseries.com`, which
+  is fully client-rendered. Fetching returns an empty shell.
+
+Those events appear in ScoreHub with their real name, date and venue and an
+empty card, marked `cardImported: false`. They are deliberately left empty
+rather than filled with plausible-looking fighters.
+
+To fill them: add the bouts to `tools/wds-source.mjs` by hand, or publish a
+JSON feed (below) and the sync picks them up on its own.
 
 > One thing to check: your site lists **WDS Rising Star 8** (24–25 Oct 2026)
 > under *Upcoming*, but that date has passed, so ScoreHub files it under Past
@@ -28,30 +45,22 @@ anyone who might take it as a record of what happened.
 
 ---
 
-## Adding fighter photos
+## Fighter photos
 
-1. Put a JPG in `client/public/fighters/`
-2. Name it exactly as listed in `client/public/fighters/FILENAMES.txt`
-
-That's it. No code change, no data change. The photo appears on the fighter
-list, the bout builder and the public fight page.
+Photos are **hotlinked from wdsmma.com**, so there is nothing to copy and
+nothing to keep in sync:
 
 ```
-client/public/fighters/
-├── FILENAMES.txt          every filename the roster expects
-├── arjun-rane.jpg
-├── kabir-shaikh.jpg
-└── …
+https://wdsmma.com/assets/images/fight-night-19/adnan-khan.webp
 ```
 
-**Until a file exists** the UI shows the fighter's initials on a corner-tinted
-tile rather than a broken image, so a half-finished photo set still looks
-deliberate.
+Update a photo on the main site and ScoreHub shows the new one. If an image is
+missing or fails to load, the UI falls back to the fighter's initials on a
+corner-tinted tile rather than a broken image.
 
-Square images, at least 400×400, under about 200 KB each.
-
-A fighter who appears on more than one card shares one photo file — the roster
-gives them a separate record per event but the same image.
+To use your own files instead, put them in `client/public/fighters/` and set
+`photo` to a relative path like `fighters/adnan-khan.jpg`. Both forms work —
+absolute URLs resolve as-is, relative ones resolve against the site.
 
 ---
 
@@ -88,10 +97,22 @@ npm test            # verifies the references still line up
 
 ### Loading it into MongoDB
 
+**The server seeds itself.** On boot, if the database has zero leagues, it loads
+the roster automatically and logs that it did. That is deliberate: Render's free
+tier gives you no shell, so there is otherwise no way to populate a fresh Atlas
+cluster, and the site comes up looking functional but empty.
+
+It only ever touches a database with no leagues in it, so it cannot overwrite
+real data. Turn it off with `AUTO_SEED=false`.
+
+To load it by hand instead:
+
 ```bash
 npm run seed                                  # local
 MONGO_URI="mongodb+srv://…" npm run seed      # Atlas
 ```
+
+Unlike auto-seed, `npm run seed` **wipes first** and reloads from scratch.
 
 Past events are seeded as `completed` bouts carrying their result, so Past
 League shows real outcomes rather than empty cards.
