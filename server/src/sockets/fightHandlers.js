@@ -75,8 +75,13 @@ function viewerSummary(boutId) {
 export function registerFightHandlers(io, socket) {
   const fail = (message) => socket.emit(FIGHT_EVT.ERROR, { message });
 
-  /** Push fresh stats + estimate for the round in play to everyone watching. */
-  async function broadcast(boutId, { withEstimate = true } = {}) {
+  /**
+   * Push fresh stats + estimate for the round in play to everyone watching.
+   * `withSnapshot` also resends the full snapshot, which carries state the
+   * stats payload does not — notably which corner holds an open control
+   * interval, so the console can flip Start control to Stop control.
+   */
+  async function broadcast(boutId, { withEstimate = true, withSnapshot = false } = {}) {
     try {
       const session = await svc.getSession(boutId);
       const roundNo = session.currentRound;
@@ -89,6 +94,10 @@ export function registerFightHandlers(io, socket) {
       if (withEstimate) {
         const { estimate } = await svc.estimateRound(boutId, roundNo);
         io.to(room).emit(FIGHT_EVT.ESTIMATE, { roundNo, estimate });
+      }
+
+      if (withSnapshot) {
+        io.to(room).emit(FIGHT_EVT.SNAPSHOT, await svc.getFightSnapshot(boutId));
       }
     } catch (err) {
       console.error('[scorehub] analytics broadcast failed:', err.message);
@@ -191,7 +200,7 @@ export function registerFightHandlers(io, socket) {
     try {
       const id = payload.boutId || socket.data.fightBoutId;
       await svc.startControl(id, payload, payload.actor);
-      await broadcast(id);
+      await broadcast(id, { withSnapshot: true });
       ack?.({ ok: true });
     } catch (err) {
       fail(err.message);
@@ -203,7 +212,7 @@ export function registerFightHandlers(io, socket) {
     try {
       const id = payload.boutId || socket.data.fightBoutId;
       await svc.stopControl(id, payload, payload.actor);
-      await broadcast(id);
+      await broadcast(id, { withSnapshot: true });
       ack?.({ ok: true });
     } catch (err) {
       fail(err.message);
@@ -215,7 +224,7 @@ export function registerFightHandlers(io, socket) {
     try {
       const id = payload.boutId || socket.data.fightBoutId;
       await svc.markControlActive(id, payload.actor);
-      await broadcast(id);
+      await broadcast(id, { withSnapshot: true });
       ack?.({ ok: true });
     } catch (err) {
       fail(err.message);

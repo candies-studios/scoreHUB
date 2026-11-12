@@ -9,7 +9,7 @@ import RoundIntelligence from './RoundIntelligence.jsx';
 import EstimatedScorecard from './EstimatedScorecard.jsx';
 import FoulsPanel from './FoulsPanel.jsx';
 import { Status } from './parts.jsx';
-import { fmtClock, ROLES, RESULT_METHODS } from '../../utils/fightConstants.js';
+import { fmtClock, eventLabel, ROLES, RESULT_METHODS } from '../../utils/fightConstants.js';
 import '../../styles/analytics.css';
 
 const TABS = [
@@ -463,7 +463,7 @@ function RecentFeed({ boutId, roundNo, canEdit, redName, blueName, refreshKey })
               <span>
                 <span className={`who ${e.corner}`}>{e.corner === 'red' ? redName : blueName}</span>
                 {' — '}
-                {e.type.replace(/_/g, ' ')}
+                {eventLabel(e.type)}
                 {e.target ? ` (${e.target}${e.position ? `, ${e.position}` : ''})` : ''}
               </span>
               <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>

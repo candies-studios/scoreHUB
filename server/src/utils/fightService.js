@@ -376,7 +376,7 @@ export async function getFightSnapshot(boutId) {
   const session = await getSession(boutId);
   const nowSec = session.elapsedSec();
 
-  const [bout, allStats, fouls] = await Promise.all([
+  const [bout, allStats, fouls, openInterval] = await Promise.all([
     Bout.findById(boutId)
       .populate('blueCorner.fighter')
       .populate('redCorner.fighter')
@@ -384,6 +384,14 @@ export async function getFightSnapshot(boutId) {
       .populate('league', 'name date location promoter'),
     getAllRoundStats(boutId, session.totalRounds, nowSec),
     FoulRecord.find({ bout: boutId, voided: false }).sort({ roundNo: 1, fightTimeSec: 1 }).lean(),
+    // Which corner, if any, is currently being credited with control. The
+    // recording console needs this to show Stop rather than Start.
+    ControlInterval.findOne({
+      bout: boutId,
+      roundNo: session.currentRound,
+      endSec: null,
+      voided: false,
+    }).lean(),
   ]);
 
   return {
@@ -393,6 +401,8 @@ export async function getFightSnapshot(boutId) {
     roundLog: session.roundLog,
     stats: allStats,
     fouls,
+    openControlCorner: openInterval?.corner || null,
+    openControlStartSec: openInterval?.startSec ?? null,
   };
 }
 

@@ -62,6 +62,34 @@ export const OBSERVATION_BUTTONS = [
   { type: 'other_significant', label: 'Other', sub: 'significant' },
 ];
 
+/**
+ * Human labels for event types, used by the activity feed and the audit view.
+ * Kept in step with the button labels above: `*_attempted` reads as "missed",
+ * because that is what the operator tapped.
+ */
+export const EVENT_LABELS = {
+  sig_strike_landed: 'Significant strike landed',
+  sig_strike_attempted: 'Significant strike missed',
+  total_strike_landed: 'Strike landed',
+  total_strike_attempted: 'Strike missed',
+  knockdown: 'Knockdown',
+  takedown_landed: 'Takedown landed',
+  takedown_attempted: 'Takedown stuffed',
+  submission_attempt: 'Submission attempt',
+  reversal: 'Reversal',
+  sweep: 'Sweep',
+  positional_advance: 'Positional advance',
+  escape: 'Escape',
+  damage_observed: 'Damage observed',
+  cut_laceration: 'Cut / laceration',
+  visible_swelling: 'Visible swelling',
+  sustained_defence_forced: 'Forced sustained defence',
+  effective_sequence: 'Effective sequence',
+  other_significant: 'Other significant event',
+};
+
+export const eventLabel = (type) => EVENT_LABELS[type] || String(type).replace(/_/g, ' ');
+
 export const CONTROL_POSITIONS = [
   { value: 'top', label: 'Top' },
   { value: 'back', label: 'Back' },
