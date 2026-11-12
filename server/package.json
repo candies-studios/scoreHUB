@@ -8,8 +8,10 @@
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
     "seed": "node src/utils/seed.js",
-    "test": "node test/logic.test.mjs && node test/fight-stats.test.mjs && node test/scoring-engine.test.mjs",
-    "test:e2e": "node test/integration.test.mjs"
+    "test": "node test/logic.test.mjs && node test/fight-stats.test.mjs && node test/scoring-engine.test.mjs && node test/brackets.test.mjs",
+    "test:e2e": "node test/integration.test.mjs",
+    "seed:events": "node src/utils/seedTournament.js",
+    "test:events": "node test/tournament.test.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

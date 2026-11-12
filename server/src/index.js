@@ -9,7 +9,9 @@ async function bootstrap() {
 
   const app = createApp();
   const server = http.createServer(app);
-  initSockets(server);
+  const io = initSockets(server);
+  // REST routes broadcast scoreboard changes made outside the socket.
+  app.set('io', io);
 
   server.listen(env.port, () => {
     console.log(`[scorehub] API listening on port ${env.port} (${env.nodeEnv})`);

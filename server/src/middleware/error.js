@@ -26,7 +26,7 @@ export function errorHandler(err, req, res, next) {
     return res.status(400).json({ message: `Invalid ${err.path}: ${err.value}` });
   }
 
-  console.error('[scorehub] error:', err);
+  if (status >= 500) console.error('[scorehub] error:', err);
   res.status(status).json({ message: err.message || 'Internal server error' });
 }
 
