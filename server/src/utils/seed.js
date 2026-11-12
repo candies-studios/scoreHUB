@@ -40,17 +40,28 @@ function loadRoster() {
 /** Combine the roster's date (YYYY-MM-DD) and time (HH:MM) into one Date. */
 const at = (date, time = '00:00') => new Date(`${date}T${time}:00`);
 
-async function seed() {
+/**
+ * Populate the database from the roster.
+ *
+ * Exported so the server can seed itself on first boot — Render's free tier
+ * has no shell, so without that a fresh Atlas database stays empty and the
+ * site shows nothing with no clue why.
+ *
+ * @param {boolean} clear  wipe first. True from the CLI, false for auto-seed,
+ *                         which only ever runs against an already-empty database.
+ */
+export async function seedDatabase({ clear = true, log = console.log } = {}) {
   const roster = loadRoster();
-  await connectDB();
 
-  console.log('[seed] clearing existing data…');
-  await Promise.all(
-    [
-      League, Fighter, Official, Bout, Scorecard,
-      FightSession, FightEvent, ControlInterval, FoulRecord, RoundAssessment, AuditLog,
-    ].map((M) => M.deleteMany({}))
-  );
+  if (clear) {
+    log('[seed] clearing existing data…');
+    await Promise.all(
+      [
+        League, Fighter, Official, Bout, Scorecard,
+        FightSession, FightEvent, ControlInterval, FoulRecord, RoundAssessment, AuditLog,
+      ].map((M) => M.deleteMany({}))
+    );
+  }
 
   // --- leagues ---------------------------------------------------------
   const leagueByKey = new Map();
@@ -148,20 +159,58 @@ async function seed() {
   }
 
   const today = new Date();
-  const upcoming = roster.leagues.filter((l) => at(l.date, l.time) >= today);
+  const upcoming = roster.leagues.filter((l) => at(l.date, l.time) >= today).length;
 
-  console.log('[seed] done.');
-  console.log(`  leagues   ${roster.leagues.length} (${upcoming.length} upcoming, ${roster.leagues.length - upcoming.length} past)`);
-  console.log(`  fighters  ${fighterByKey.size}`);
-  console.log(`  officials ${officialByKey.size}`);
-  console.log(`  bouts     ${roster.bouts.length} (${completed} completed)`);
+  const summary = {
+    leagues: roster.leagues.length,
+    upcoming,
+    past: roster.leagues.length - upcoming,
+    fighters: fighterByKey.size,
+    officials: officialByKey.size,
+    bouts: roster.bouts.length,
+    completed,
+  };
 
+  log('[seed] done.');
+  log(`  leagues   ${summary.leagues} (${summary.upcoming} upcoming, ${summary.past} past)`);
+  log(`  fighters  ${summary.fighters}`);
+  log(`  officials ${summary.officials}`);
+  log(`  bouts     ${summary.bouts} (${summary.completed} completed)`);
+
+  return summary;
+}
+
+/**
+ * Seed only a pristine database.
+ *
+ * Returns null without touching anything if a single league already exists, so
+ * this can run on every boot and can never overwrite real event data.
+ */
+export async function seedIfEmpty() {
+  const existing = await League.estimatedDocumentCount();
+  if (existing > 0) return null;
+
+  console.log('[scorehub] database is empty — seeding it from the bundled roster.');
+  console.log('[scorehub] set AUTO_SEED=false to disable this.');
+  return seedDatabase({ clear: false });
+}
+
+/** CLI entry point: `npm run seed`. */
+async function main() {
+  await connectDB();
+  await seedDatabase({ clear: true });
   await mongoose.disconnect();
   process.exit(0);
 }
 
-seed().catch(async (err) => {
-  console.error('[seed] failed:', err);
-  await mongoose.disconnect();
-  process.exit(1);
-});
+// Only run as a script, not when imported by the server.
+const invokedDirectly =
+  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invokedDirectly) {
+  main().catch(async (err) => {
+    console.error('[seed] failed:', err);
+    await mongoose.disconnect();
+    process.exit(1);
+  });
+}
