@@ -21,6 +21,18 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
     },
+    css: {
+      /**
+       * Pin PostCSS to an empty config.
+       *
+       * Vite otherwise searches upward from this folder for postcss.config.*,
+       * so an unrelated config at the repo root gets applied to this build —
+       * and fails it outright if that config requires a plugin (Tailwind, say)
+       * that this workspace does not install. This app uses plain CSS, so
+       * there is nothing to configure and nothing to inherit.
+       */
+      postcss: {},
+    },
     server: {
       port: 5173,
       proxy: {
