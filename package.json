@@ -15,9 +15,6 @@
     "build": "npm --workspace client run build",
     "start": "npm --workspace server run start",
     "seed": "npm --workspace server run seed",
-    "roster": "node tools/build-roster.mjs",
-    "sync": "node tools/sync-wds.mjs",
-    "sync:check": "node tools/sync-wds.mjs --dry-run",
     "test": "npm --workspace server run test",
     "test:e2e": "npm --workspace server run test:e2e",
     "lint": "npm --workspace client run lint"

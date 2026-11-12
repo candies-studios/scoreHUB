@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { boutApi } from '../api/resources.js';
-import { errMsg, DEMO_MODE } from '../api/client.js';
+import { errMsg } from '../api/client.js';
 import useBoutSocket from '../hooks/useBoutSocket.js';
 import { WaitingModal, ResultModal } from '../components/Modal.jsx';
 import SeatPicker from '../components/SeatPicker.jsx';
@@ -193,10 +193,6 @@ export default function LiveScoring() {
       );
     return { blue: sum('blue'), red: sum('red') };
   }, [logs]);
-
-  if (DEMO_MODE) {
-    return <DemoNotice title="Judge scoring is offline" onBack={() => navigate(-1)} />;
-  }
 
   if (!bout) return <div className="empty">{error || 'Loading bout…'}</div>;
 
@@ -426,24 +422,5 @@ export default function LiveScoring() {
         />
       )}
     </>
-  );
-}
-
-/** Realtime screens cannot work without the Socket.IO server. Say so plainly. */
-function DemoNotice({ title, onBack }) {
-  return (
-    <div className="card" style={{ textAlign: 'center', maxWidth: 620, margin: '40px auto' }}>
-      <h2 style={{ marginTop: 0 }}>{title}</h2>
-      <p style={{ color: 'var(--ink-soft)', lineHeight: 1.65 }}>
-        This site is running in <strong>demo mode</strong> with no backend connected.
-        Browsing events, fighters and bouts works from the bundled data, but live
-        scoring needs the realtime server.
-      </p>
-      <p style={{ color: 'var(--ink-soft)', fontSize: '0.86rem', lineHeight: 1.65 }}>
-        Deploy the API (see <code>render.yaml</code>) and set the <code>API_URL</code>{' '}
-        repository variable, then this screen works.
-      </p>
-      <button className="btn btn-ghost btn-sm" onClick={onBack}>Back</button>
-    </div>
   );
 }

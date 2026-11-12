@@ -99,41 +99,6 @@ One honest limitation: nothing stops two people picking the same judge seat. The
 list shows names as people join, so a collision is visible immediately, and **Switch**
 fixes it. If you need that enforced, add PINs — see below.
 
-## Event data — synced from wdsmma.com
-
-ScoreHub reads its events from the main site, so adding an event there makes it
-appear in the dashboard. A scheduled Action re-reads wdsmma.com every morning
-and opens a pull request when anything changes.
-
-Currently imported, all real:
-
-- **7 events** with their dates and venues, split into Upcoming and Past by date
-- **WDS Fight Night 19** — the full 15-bout card, 29 fighters with countries and weights
-- **Fighter photos**, hotlinked from wdsmma.com so they update themselves
-
-Six events have no card yet: their fight cards are rendered by JavaScript or
-live on warriorsdreamseries.com, neither of which serves anything a fetcher can
-read. They appear with their real details and an empty card rather than with
-invented fighters.
-
-```bash
-npm run sync:check   # report what differs from the live site
-npm run sync         # pull the changes in
-```
-
-Data notes: **[docs/DATA.md](docs/DATA.md)** · how the sync works and the JSON
-feed that would make it bulletproof: **[docs/SYNC.md](docs/SYNC.md)**
-
-## Demo mode
-
-With no `API_URL` configured the client serves the browsing screens from that
-bundled JSON, so the GitHub Pages site shows real events, fighters and bouts
-with no backend at all. An orange banner says so, and anything that would need
-the server (saving, judge scoring, live analytics) says what it needs instead of
-failing silently.
-
-Set the `API_URL` repository variable and every request goes to the real API.
-
 ## Fight analytics
 
 A second, independent layer for live MMA statistics and estimated round scoring. It
@@ -374,7 +339,6 @@ POST   /api/bouts/:id/reset
 | `PORT` | `5000` | API port |
 | `MONGO_URI` | `mongodb://127.0.0.1:27017/scorehub` | Database |
 | `CLIENT_ORIGIN` | `*` | CORS allowlist, comma-separated. Origin only — no path or trailing slash |
-| `AUTO_SEED` | `true` | Seed the database on boot if it has no leagues. Never overwrites existing data |
 | `VITE_API_URL` | `http://localhost:5000` | API base the client calls. Baked in at build time |
 | `BASE_PATH` | `/` | Sub-path the client is served from. Pages needs `/<repo>/`; the workflow sets it |
 
@@ -389,9 +353,7 @@ npm run dev:client   # Vite only
 npm run build        # production client bundle -> client/dist
 npm start            # run the API (serve client/dist behind nginx or similar)
 npm run seed         # reset and populate demo data
-npm test             # 125 checks: judge logic, statistics, scoring engine, roster. No DB needed
-npm run roster       # regenerate client/public/data/wds-roster.json
-npm run sync:check   # compare the committed data with wdsmma.com
+npm test             # 72 checks: judge logic, statistics, scoring engine. No DB needed
 npm run test:e2e     # full server + socket run (needs MONGO_TEST_URI or mongodb-memory-server)
 npm run lint         # eslint the client
 ```

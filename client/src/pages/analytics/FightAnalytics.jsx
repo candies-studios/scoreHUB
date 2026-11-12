@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import useFightSocket from '../../hooks/useFightSocket.js';
 import { fightApi } from '../../api/fightApi.js';
-import { errMsg, DEMO_MODE } from '../../api/client.js';
+import { errMsg } from '../../api/client.js';
 import CornerPad from './CornerPad.jsx';
 import LiveStats from './LiveStats.jsx';
 import RoundIntelligence from './RoundIntelligence.jsx';
@@ -142,10 +142,6 @@ export default function FightAnalytics() {
     actions.result(resultForm);
     setLocalError('');
   };
-
-  if (DEMO_MODE) {
-    return <AnalyticsDemoNotice onBack={() => navigate(-1)} />;
-  }
 
   if (!snapshot) {
     return (
@@ -484,27 +480,6 @@ function RecentFeed({ boutId, roundNo, canEdit, redName, blueName, refreshKey })
         Undo needs a reason and soft-deletes the entry. Statistics are recalculated from the
         remaining events, so nothing is ever double counted or silently rewritten.
       </p>
-    </div>
-  );
-}
-
-/** The analytics engine is server-side; there is nothing to emulate offline. */
-function AnalyticsDemoNotice({ onBack }) {
-  return (
-    <div className="fa">
-      <div className="fa-panel" style={{ maxWidth: 640, margin: '20px auto', textAlign: 'center' }}>
-        <h3>Fight analytics is offline</h3>
-        <p className="fa-note" style={{ lineHeight: 1.7 }}>
-          This site is running in <strong>demo mode</strong> with no backend connected.
-          Event, fighter and bout browsing works from the bundled data, but live statistics
-          recording and the estimated round scoring engine both run on the server.
-        </p>
-        <p className="fa-note" style={{ lineHeight: 1.7 }}>
-          Deploy the API (see <code>render.yaml</code>) and set the <code>API_URL</code>{' '}
-          repository variable to enable it.
-        </p>
-        <button className="fa-btn" onClick={onBack} style={{ marginTop: 10 }}>Back</button>
-      </div>
     </div>
   );
 }

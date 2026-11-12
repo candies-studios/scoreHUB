@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TextField, SelectField } from '../components/Field.jsx';
 import { boutApi, fighterApi, officialApi } from '../api/resources.js';
-import { errMsg } from '../api/client.js';
-import Avatar from '../components/Avatar.jsx';
+import { errMsg, mediaUrl } from '../api/client.js';
 import { fmtDateInput, ROUND_DURATIONS } from '../utils/format.js';
 
 const BLANK = {
@@ -108,7 +107,6 @@ export default function BoutForm() {
   const refOptions = referees.map((r) => ({ value: r._id, label: r.name }));
 
   const photoOf = (id) => fighters.find((f) => f._id === id)?.photoUrl;
-  const nameOf = (id) => fighters.find((f) => f._id === id)?.name || '';
 
   return (
     <form onSubmit={submit}>
@@ -194,16 +192,12 @@ export default function BoutForm() {
             onChange={(e) => set('blueCornerFighter', e.target.value)}
             options={fighterOptions}
           />
-          {form.blueCornerFighter && (
-            <div style={{ margin: '0 auto' }}>
-              <Avatar
-                name={nameOf(form.blueCornerFighter)}
-                photoUrl={photoOf(form.blueCornerFighter)}
-                corner="blue"
-                size={126}
-                rounded="8px"
-              />
-            </div>
+          {photoOf(form.blueCornerFighter) && (
+            <img
+              src={mediaUrl(photoOf(form.blueCornerFighter))}
+              alt=""
+              style={{ width: 126, height: 200, objectFit: 'cover', borderRadius: 6, margin: '0 auto' }}
+            />
           )}
         </div>
 
@@ -221,16 +215,12 @@ export default function BoutForm() {
             onChange={(e) => set('redCornerFighter', e.target.value)}
             options={fighterOptions}
           />
-          {form.redCornerFighter && (
-            <div style={{ margin: '0 auto' }}>
-              <Avatar
-                name={nameOf(form.redCornerFighter)}
-                photoUrl={photoOf(form.redCornerFighter)}
-                corner="red"
-                size={126}
-                rounded="8px"
-              />
-            </div>
+          {photoOf(form.redCornerFighter) && (
+            <img
+              src={mediaUrl(photoOf(form.redCornerFighter))}
+              alt=""
+              style={{ width: 126, height: 200, objectFit: 'cover', borderRadius: 6, margin: '0 auto' }}
+            />
           )}
         </div>
       </div>

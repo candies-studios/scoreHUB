@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useFightSocket from '../../hooks/useFightSocket.js';
 import { fightApi } from '../../api/fightApi.js';
-import { DEMO_MODE } from '../../api/client.js';
 import LiveStats from './LiveStats.jsx';
 import EstimatedScorecard from './EstimatedScorecard.jsx';
 import { Status, EstimateDisclaimer, Confidence } from './parts.jsx';
@@ -27,20 +26,6 @@ export default function PublicFight() {
     if (tab !== 'scorecard') return;
     fightApi.scorecard(boutId).then(setScorecard).catch(() => setScorecard(null));
   }, [boutId, tab, estimate]);
-
-  if (DEMO_MODE) {
-    return (
-      <div className="fa">
-        <div className="fa-panel" style={{ maxWidth: 620, margin: '20px auto', textAlign: 'center' }}>
-          <h3>Live fight page is offline</h3>
-          <p className="fa-note" style={{ lineHeight: 1.7 }}>
-            Live statistics stream from the realtime server, which is not connected on this
-            demo site. Event, fighter and bout details are available from the bout list.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (!snapshot) {
     return (

@@ -4,8 +4,7 @@ import PillTable from '../components/PillTable.jsx';
 import Modal from '../components/Modal.jsx';
 import { TextField, SelectField } from '../components/Field.jsx';
 import { fighterApi } from '../api/resources.js';
-import { errMsg } from '../api/client.js';
-import Avatar from '../components/Avatar.jsx';
+import { errMsg, mediaUrl } from '../api/client.js';
 
 const BLANK = {
   name: '',
@@ -100,7 +99,16 @@ export default function FighterList() {
       key: 'photo',
       label: 'Photo',
       width: '0.6fr',
-      render: (r) => <Avatar name={r.name} photoUrl={r.photoUrl} size={30} />,
+      render: (r) =>
+        r.photoUrl ? (
+          <img
+            src={mediaUrl(r.photoUrl)}
+            alt={r.name}
+            style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }}
+          />
+        ) : (
+          '—'
+        ),
     },
     { key: 'name', label: 'Fighter Name' },
     { key: 'team', label: 'Team' },
