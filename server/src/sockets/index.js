@@ -23,7 +23,6 @@ import {
   buildSummary,
 } from '../utils/scoring.js';
 import registerFightHandlers from './fightHandlers.js';
-import registerMatHandlers from './matHandlers.js';
 
 export function initSockets(httpServer) {
   const io = new Server(httpServer, {
@@ -39,8 +38,6 @@ export function initSockets(httpServer) {
     // Analytics channel — its own rooms and event names, registered on the
     // same connection so one socket can serve both if a client needs it.
     registerFightHandlers(io, socket);
-    // Tournament mat scoreboard channel — `match:*` / `mat:*`.
-    registerMatHandlers(io, socket);
 
     const fail = (message) => socket.emit(EVT.ERROR, { message });
 

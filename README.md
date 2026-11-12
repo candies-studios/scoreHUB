@@ -22,20 +22,6 @@ scoring engine needs to keep three separate scorecards.
 > venue LAN. Don't put an event you care about on a public URL without putting something
 > in front of it — see [Locking it down](#locking-it-down).
 
-## Tournaments (new)
-
-Besides fight-night leagues, ScoreHub now runs **open-entry tournaments** the way
-Smoothcomp does: event pages with online registration, divisions by age / gender / belt /
-weight, automatic brackets (team-mates kept apart, byes to seeds, round robin for small
-divisions), mat scheduling, a live BJJ scoreboard with a TV display for every mat, results
-with academy medal tables, and athlete / academy profiles and rankings.
-
-```bash
-npm run seed:events   # demo academies, athletes, a finished event and an open one
-```
-
-Then open http://localhost:5173/events. Full guide: **[docs/TOURNAMENTS.md](docs/TOURNAMENTS.md)**.
-
 ## Stack
 
 | Layer     | Choice |
@@ -112,6 +98,31 @@ into someone else's card.
 One honest limitation: nothing stops two people picking the same judge seat. The presence
 list shows names as people join, so a collision is visible immediately, and **Switch**
 fixes it. If you need that enforced, add PINs — see below.
+
+## Event data
+
+The app ships with the real WDS event calendar — 7 events, split automatically
+into **Upcoming League** and **Past League** by their date, with fighters, bouts
+and results on the past cards.
+
+It all lives in one file, `client/public/data/wds-roster.json`, read by both the
+MongoDB seed and the offline demo. Fighter photos drop into
+`client/public/fighters/` using the names in `FILENAMES.txt`; until they exist
+the UI shows initials.
+
+Event names, dates and venues are real (from wdsmma.com). **Fighter names and
+results are placeholders** carried over from the previous ScoreHUB demo data —
+replace them with the real cards. Full notes: **[docs/DATA.md](docs/DATA.md)**.
+
+## Demo mode
+
+With no `API_URL` configured the client serves the browsing screens from that
+bundled JSON, so the GitHub Pages site shows real events, fighters and bouts
+with no backend at all. An orange banner says so, and anything that would need
+the server (saving, judge scoring, live analytics) says what it needs instead of
+failing silently.
+
+Set the `API_URL` repository variable and every request goes to the real API.
 
 ## Fight analytics
 
@@ -367,7 +378,8 @@ npm run dev:client   # Vite only
 npm run build        # production client bundle -> client/dist
 npm start            # run the API (serve client/dist behind nginx or similar)
 npm run seed         # reset and populate demo data
-npm test             # 72 checks: judge logic, statistics, scoring engine. No DB needed
+npm test             # 91 checks: judge logic, statistics, scoring engine, roster. No DB needed
+npm run roster       # regenerate client/public/data/wds-roster.json
 npm run test:e2e     # full server + socket run (needs MONGO_TEST_URI or mongodb-memory-server)
 npm run lint         # eslint the client
 ```

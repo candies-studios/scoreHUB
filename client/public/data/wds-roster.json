@@ -1,0 +1,1479 @@
+{
+  "generatedAt": "2026-11-12T11:31:26.964Z",
+  "source": {
+    "events": "Real. Names, dates and venues from wdsmma.com.",
+    "fighters": "Placeholder. WDS does not publish a roster, so these carry over from the previous ScoreHUB demo data and are extended in the same style. Replace with real cards.",
+    "photos": "Drop files at client/public/fighters/<slug>.jpg. Missing files fall back to initials."
+  },
+  "leagues": [
+    {
+      "id": "wds-fight-night-19",
+      "name": "WDS Fight Night 19",
+      "series": "Championship Series",
+      "date": "2026-12-12",
+      "time": "17:00",
+      "location": "CIDCO Exhibition Ground, Vashi, Navi Mumbai",
+      "promoter": "Warriors Dream Series",
+      "bouts": {
+        "amateurMMA": 0,
+        "amateurBJJ": 0,
+        "amateurK1": 0,
+        "proMMA": 4,
+        "proBJJ": 0,
+        "proK1": 0
+      }
+    },
+    {
+      "id": "wds-rising-star-8",
+      "name": "WDS Rising Star 8",
+      "series": "Rising Star Series",
+      "date": "2026-10-24",
+      "time": "08:00",
+      "location": "Fit & Fight Club, Wagholi, Pune",
+      "promoter": "Warriors Dream Series",
+      "bouts": {
+        "amateurMMA": 2,
+        "amateurBJJ": 1,
+        "amateurK1": 0,
+        "proMMA": 0,
+        "proBJJ": 0,
+        "proK1": 0
+      }
+    },
+    {
+      "id": "wds-fight-night-18",
+      "name": "WDS Fight Night 18",
+      "series": "Championship Series",
+      "date": "2026-08-29",
+      "time": "17:00",
+      "location": "CIDCO Exhibition & Convention Centre, Vashi, Navi Mumbai",
+      "promoter": "Warriors Dream Series",
+      "bouts": {
+        "amateurMMA": 0,
+        "amateurBJJ": 0,
+        "amateurK1": 0,
+        "proMMA": 3,
+        "proBJJ": 0,
+        "proK1": 0
+      }
+    },
+    {
+      "id": "wds-rising-star-7",
+      "name": "WDS Rising Star 7",
+      "series": "Rising Star Series",
+      "date": "2026-07-25",
+      "time": "08:00",
+      "location": "Fit & Fight Club, Nerul, Navi Mumbai",
+      "promoter": "Warriors Dream Series",
+      "bouts": {
+        "amateurMMA": 2,
+        "amateurBJJ": 0,
+        "amateurK1": 0,
+        "proMMA": 0,
+        "proBJJ": 0,
+        "proK1": 0
+      }
+    },
+    {
+      "id": "wds-fight-night-17",
+      "name": "WDS Fight Night 17",
+      "series": "Championship Series",
+      "date": "2026-06-06",
+      "time": "17:00",
+      "location": "Sports Complex, Mumbai University, Kalina",
+      "promoter": "Warriors Dream Series",
+      "bouts": {
+        "amateurMMA": 0,
+        "amateurBJJ": 0,
+        "amateurK1": 0,
+        "proMMA": 2,
+        "proBJJ": 0,
+        "proK1": 1
+      }
+    },
+    {
+      "id": "wds-rising-star-6",
+      "name": "WDS Rising Star 6",
+      "series": "Rising Star Series",
+      "date": "2026-04-25",
+      "time": "08:00",
+      "location": "Fit & Fight Club, Nerul, Navi Mumbai",
+      "promoter": "Warriors Dream Series",
+      "bouts": {
+        "amateurMMA": 1,
+        "amateurBJJ": 1,
+        "amateurK1": 0,
+        "proMMA": 0,
+        "proBJJ": 0,
+        "proK1": 0
+      }
+    },
+    {
+      "id": "wds-fight-night-16",
+      "name": "WDS Fight Night 16",
+      "series": "Championship Series",
+      "date": "2026-03-28",
+      "time": "17:00",
+      "location": "Lovely Professional University, Jalandhar",
+      "promoter": "Warriors Dream Series",
+      "bouts": {
+        "amateurMMA": 0,
+        "amateurBJJ": 0,
+        "amateurK1": 0,
+        "proMMA": 2,
+        "proBJJ": 0,
+        "proK1": 0
+      }
+    }
+  ],
+  "fighters": [
+    {
+      "id": "wds-fight-night-19-arjun-rane",
+      "league": "wds-fight-night-19",
+      "name": "Arjun Rane",
+      "team": "Mumbai Fight Club",
+      "coach": "R. Mehta",
+      "country": "India",
+      "weightClass": "Flyweight",
+      "weightKg": 56.7,
+      "gender": "male",
+      "record": {
+        "wins": 8,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/arjun-rane.jpg"
+    },
+    {
+      "id": "wds-fight-night-19-kabir-shaikh",
+      "league": "wds-fight-night-19",
+      "name": "Kabir Shaikh",
+      "team": "Pune Combat Academy",
+      "coach": "S. Pawar",
+      "country": "India",
+      "weightClass": "Flyweight",
+      "weightKg": 56.7,
+      "gender": "male",
+      "record": {
+        "wins": 11,
+        "losses": 3,
+        "draws": 0
+      },
+      "photo": "fighters/kabir-shaikh.jpg"
+    },
+    {
+      "id": "wds-fight-night-19-rohit-tamang",
+      "league": "wds-fight-night-19",
+      "name": "Rohit Tamang",
+      "team": "Darjeeling Warriors",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Bantamweight",
+      "weightKg": 61.2,
+      "gender": "male",
+      "record": {
+        "wins": 6,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/rohit-tamang.jpg"
+    },
+    {
+      "id": "wds-fight-night-19-imran-qureshi",
+      "league": "wds-fight-night-19",
+      "name": "Imran Qureshi",
+      "team": "Hyderabad Top Team",
+      "coach": "A. Khan",
+      "country": "India",
+      "weightClass": "Bantamweight",
+      "weightKg": 61.2,
+      "gender": "male",
+      "record": {
+        "wins": 9,
+        "losses": 4,
+        "draws": 1
+      },
+      "photo": "fighters/imran-qureshi.jpg"
+    },
+    {
+      "id": "wds-fight-night-19-neha-salunkhe",
+      "league": "wds-fight-night-19",
+      "name": "Neha Salunkhe",
+      "team": "Nerul MMA",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Women's Strawweight",
+      "weightKg": 70,
+      "gender": "female",
+      "record": {
+        "wins": 5,
+        "losses": 0,
+        "draws": 0
+      },
+      "photo": "fighters/neha-salunkhe.jpg"
+    },
+    {
+      "id": "wds-fight-night-19-priya-naik",
+      "league": "wds-fight-night-19",
+      "name": "Priya Naik",
+      "team": "Goa Grapple House",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Women's Strawweight",
+      "weightKg": 70,
+      "gender": "female",
+      "record": {
+        "wins": 4,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/priya-naik.jpg"
+    },
+    {
+      "id": "wds-fight-night-19-tomas-rivera",
+      "league": "wds-fight-night-19",
+      "name": "Tomas Rivera",
+      "team": "Entram Gym",
+      "coach": "",
+      "country": "Spain",
+      "weightClass": "Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 8,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/tomas-rivera.jpg"
+    },
+    {
+      "id": "wds-fight-night-19-yusuf-demir",
+      "league": "wds-fight-night-19",
+      "name": "Yusuf Demir",
+      "team": "Istanbul MMA",
+      "coach": "",
+      "country": "Turkiye",
+      "weightClass": "Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 10,
+        "losses": 3,
+        "draws": 0
+      },
+      "photo": "fighters/yusuf-demir.jpg"
+    },
+    {
+      "id": "wds-rising-star-8-aditya-pawar",
+      "league": "wds-rising-star-8",
+      "name": "Aditya Pawar",
+      "team": "Wagholi Warriors",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Flyweight",
+      "weightKg": 56.7,
+      "gender": "male",
+      "record": {
+        "wins": 3,
+        "losses": 0,
+        "draws": 0
+      },
+      "photo": "fighters/aditya-pawar.jpg"
+    },
+    {
+      "id": "wds-rising-star-8-sameer-joshi",
+      "league": "wds-rising-star-8",
+      "name": "Sameer Joshi",
+      "team": "Pune Combat Academy",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Flyweight",
+      "weightKg": 56.7,
+      "gender": "male",
+      "record": {
+        "wins": 2,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/sameer-joshi.jpg"
+    },
+    {
+      "id": "wds-rising-star-8-vikram-shinde",
+      "league": "wds-rising-star-8",
+      "name": "Vikram Shinde",
+      "team": "Nashik Fight Lab",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Bantamweight",
+      "weightKg": 61.2,
+      "gender": "male",
+      "record": {
+        "wins": 4,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/vikram-shinde.jpg"
+    },
+    {
+      "id": "wds-rising-star-8-faizan-ansari",
+      "league": "wds-rising-star-8",
+      "name": "Faizan Ansari",
+      "team": "Bhiwandi Grapplers",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Bantamweight",
+      "weightKg": 61.2,
+      "gender": "male",
+      "record": {
+        "wins": 3,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/faizan-ansari.jpg"
+    },
+    {
+      "id": "wds-rising-star-8-karan-dhanda",
+      "league": "wds-rising-star-8",
+      "name": "Karan Dhanda",
+      "team": "Pune BJJ",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur BJJ Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 6,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/karan-dhanda.jpg"
+    },
+    {
+      "id": "wds-rising-star-8-mehul-rathod",
+      "league": "wds-rising-star-8",
+      "name": "Mehul Rathod",
+      "team": "Surat Submission",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur BJJ Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 5,
+        "losses": 3,
+        "draws": 1
+      },
+      "photo": "fighters/mehul-rathod.jpg"
+    },
+    {
+      "id": "wds-fight-night-18-harsh-vardhan",
+      "league": "wds-fight-night-18",
+      "name": "Harsh Vardhan",
+      "team": "Delhi Combat Club",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Welterweight",
+      "weightKg": 77.1,
+      "gender": "male",
+      "record": {
+        "wins": 12,
+        "losses": 4,
+        "draws": 0
+      },
+      "photo": "fighters/harsh-vardhan.jpg"
+    },
+    {
+      "id": "wds-fight-night-18-suraj-gurung",
+      "league": "wds-fight-night-18",
+      "name": "Suraj Gurung",
+      "team": "Kathmandu Fight House",
+      "coach": "",
+      "country": "Nepal",
+      "weightClass": "Welterweight",
+      "weightKg": 77.1,
+      "gender": "male",
+      "record": {
+        "wins": 10,
+        "losses": 5,
+        "draws": 1
+      },
+      "photo": "fighters/suraj-gurung.jpg"
+    },
+    {
+      "id": "wds-fight-night-18-anil-chauhan",
+      "league": "wds-fight-night-18",
+      "name": "Anil Chauhan",
+      "team": "Jaipur Jiu-Jitsu",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Featherweight",
+      "weightKg": 65.8,
+      "gender": "male",
+      "record": {
+        "wins": 7,
+        "losses": 3,
+        "draws": 0
+      },
+      "photo": "fighters/anil-chauhan.jpg"
+    },
+    {
+      "id": "wds-fight-night-18-ravi-teja",
+      "league": "wds-fight-night-18",
+      "name": "Ravi Teja",
+      "team": "Hyderabad Top Team",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Featherweight",
+      "weightKg": 65.8,
+      "gender": "male",
+      "record": {
+        "wins": 9,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/ravi-teja.jpg"
+    },
+    {
+      "id": "wds-fight-night-18-shraddha-more",
+      "league": "wds-fight-night-18",
+      "name": "Shraddha More",
+      "team": "Nerul MMA",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Women's Flyweight",
+      "weightKg": 56.7,
+      "gender": "female",
+      "record": {
+        "wins": 6,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/shraddha-more.jpg"
+    },
+    {
+      "id": "wds-fight-night-18-ritika-bose",
+      "league": "wds-fight-night-18",
+      "name": "Ritika Bose",
+      "team": "Kolkata Cage",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Women's Flyweight",
+      "weightKg": 56.7,
+      "gender": "female",
+      "record": {
+        "wins": 5,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/ritika-bose.jpg"
+    },
+    {
+      "id": "wds-rising-star-7-omkar-jadhav",
+      "league": "wds-rising-star-7",
+      "name": "Omkar Jadhav",
+      "team": "Nerul MMA",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 2,
+        "losses": 0,
+        "draws": 0
+      },
+      "photo": "fighters/omkar-jadhav.jpg"
+    },
+    {
+      "id": "wds-rising-star-7-rizwan-shaikh",
+      "league": "wds-rising-star-7",
+      "name": "Rizwan Shaikh",
+      "team": "Mumbai Fight Club",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/rizwan-shaikh.jpg"
+    },
+    {
+      "id": "wds-rising-star-7-prathamesh-kale",
+      "league": "wds-rising-star-7",
+      "name": "Prathamesh Kale",
+      "team": "Thane Takedown",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Welterweight",
+      "weightKg": 77.1,
+      "gender": "male",
+      "record": {
+        "wins": 4,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/prathamesh-kale.jpg"
+    },
+    {
+      "id": "wds-rising-star-7-gagan-deep",
+      "league": "wds-rising-star-7",
+      "name": "Gagan Deep",
+      "team": "Punjab Pehlwan MMA",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Welterweight",
+      "weightKg": 77.1,
+      "gender": "male",
+      "record": {
+        "wins": 5,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/gagan-deep.jpg"
+    },
+    {
+      "id": "wds-fight-night-17-jaskaran-singh",
+      "league": "wds-fight-night-17",
+      "name": "Jaskaran Singh",
+      "team": "Punjab Pehlwan MMA",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Middleweight",
+      "weightKg": 83.9,
+      "gender": "male",
+      "record": {
+        "wins": 11,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/jaskaran-singh.jpg"
+    },
+    {
+      "id": "wds-fight-night-17-daniel-costa",
+      "league": "wds-fight-night-17",
+      "name": "Daniel Costa",
+      "team": "Lisbon Top Team",
+      "coach": "",
+      "country": "Portugal",
+      "weightClass": "Middleweight",
+      "weightKg": 83.9,
+      "gender": "male",
+      "record": {
+        "wins": 13,
+        "losses": 6,
+        "draws": 0
+      },
+      "photo": "fighters/daniel-costa.jpg"
+    },
+    {
+      "id": "wds-fight-night-17-tomas-rivera",
+      "league": "wds-fight-night-17",
+      "name": "Tomas Rivera",
+      "team": "Entram Gym",
+      "coach": "",
+      "country": "Spain",
+      "weightClass": "Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 8,
+        "losses": 2,
+        "draws": 0
+      },
+      "photo": "fighters/tomas-rivera.jpg"
+    },
+    {
+      "id": "wds-fight-night-17-yusuf-demir",
+      "league": "wds-fight-night-17",
+      "name": "Yusuf Demir",
+      "team": "Istanbul MMA",
+      "coach": "",
+      "country": "Turkiye",
+      "weightClass": "Lightweight",
+      "weightKg": 70.3,
+      "gender": "male",
+      "record": {
+        "wins": 10,
+        "losses": 3,
+        "draws": 0
+      },
+      "photo": "fighters/yusuf-demir.jpg"
+    },
+    {
+      "id": "wds-fight-night-17-akash-yadav",
+      "league": "wds-fight-night-17",
+      "name": "Akash Yadav",
+      "team": "Lucknow Striking",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Catchweight K1",
+      "weightKg": 70,
+      "gender": "male",
+      "record": {
+        "wins": 9,
+        "losses": 3,
+        "draws": 1
+      },
+      "photo": "fighters/akash-yadav.jpg"
+    },
+    {
+      "id": "wds-fight-night-17-tenzin-norbu",
+      "league": "wds-fight-night-17",
+      "name": "Tenzin Norbu",
+      "team": "Dharamshala Muay Thai",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Catchweight K1",
+      "weightKg": 70,
+      "gender": "male",
+      "record": {
+        "wins": 8,
+        "losses": 4,
+        "draws": 0
+      },
+      "photo": "fighters/tenzin-norbu.jpg"
+    },
+    {
+      "id": "wds-rising-star-6-nikhil-patil",
+      "league": "wds-rising-star-6",
+      "name": "Nikhil Patil",
+      "team": "Nashik Fight Lab",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Featherweight",
+      "weightKg": 65.8,
+      "gender": "male",
+      "record": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "photo": "fighters/nikhil-patil.jpg"
+    },
+    {
+      "id": "wds-rising-star-6-zaid-memon",
+      "league": "wds-rising-star-6",
+      "name": "Zaid Memon",
+      "team": "Bhiwandi Grapplers",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur Featherweight",
+      "weightKg": 65.8,
+      "gender": "male",
+      "record": {
+        "wins": 2,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/zaid-memon.jpg"
+    },
+    {
+      "id": "wds-rising-star-6-rahul-verma",
+      "league": "wds-rising-star-6",
+      "name": "Rahul Verma",
+      "team": "Pune BJJ",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur BJJ Middleweight",
+      "weightKg": 83.9,
+      "gender": "male",
+      "record": {
+        "wins": 4,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/rahul-verma.jpg"
+    },
+    {
+      "id": "wds-rising-star-6-siddharth-rao",
+      "league": "wds-rising-star-6",
+      "name": "Siddharth Rao",
+      "team": "Bangalore Grappling",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Amateur BJJ Middleweight",
+      "weightKg": 83.9,
+      "gender": "male",
+      "record": {
+        "wins": 6,
+        "losses": 0,
+        "draws": 0
+      },
+      "photo": "fighters/siddharth-rao.jpg"
+    },
+    {
+      "id": "wds-fight-night-16-manpreet-brar",
+      "league": "wds-fight-night-16",
+      "name": "Manpreet Brar",
+      "team": "Jalandhar Combat",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Bantamweight",
+      "weightKg": 61.2,
+      "gender": "male",
+      "record": {
+        "wins": 7,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/manpreet-brar.jpg"
+    },
+    {
+      "id": "wds-fight-night-16-rohit-tamang",
+      "league": "wds-fight-night-16",
+      "name": "Rohit Tamang",
+      "team": "Darjeeling Warriors",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Bantamweight",
+      "weightKg": 61.2,
+      "gender": "male",
+      "record": {
+        "wins": 6,
+        "losses": 1,
+        "draws": 0
+      },
+      "photo": "fighters/rohit-tamang.jpg"
+    },
+    {
+      "id": "wds-fight-night-16-gurpreet-sandhu",
+      "league": "wds-fight-night-16",
+      "name": "Gurpreet Sandhu",
+      "team": "Punjab Pehlwan MMA",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Welterweight",
+      "weightKg": 77.1,
+      "gender": "male",
+      "record": {
+        "wins": 10,
+        "losses": 4,
+        "draws": 0
+      },
+      "photo": "fighters/gurpreet-sandhu.jpg"
+    },
+    {
+      "id": "wds-fight-night-16-harsh-vardhan",
+      "league": "wds-fight-night-16",
+      "name": "Harsh Vardhan",
+      "team": "Delhi Combat Club",
+      "coach": "",
+      "country": "India",
+      "weightClass": "Welterweight",
+      "weightKg": 77.1,
+      "gender": "male",
+      "record": {
+        "wins": 12,
+        "losses": 4,
+        "draws": 0
+      },
+      "photo": "fighters/harsh-vardhan.jpg"
+    }
+  ],
+  "officials": [
+    {
+      "id": "wds-fight-night-19-judge-poonam-deshmukh",
+      "league": "wds-fight-night-19",
+      "kind": "judge",
+      "name": "Poonam Deshmukh",
+      "contactNo": "9876543212",
+      "bloodGroup": "B+"
+    },
+    {
+      "id": "wds-fight-night-19-judge-ayush-kulkarni",
+      "league": "wds-fight-night-19",
+      "kind": "judge",
+      "name": "Ayush Kulkarni",
+      "contactNo": "9876543213",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-fight-night-19-judge-sandeep-rawat",
+      "league": "wds-fight-night-19",
+      "kind": "judge",
+      "name": "Sandeep Rawat",
+      "contactNo": "9876543214",
+      "bloodGroup": "A+"
+    },
+    {
+      "id": "wds-fight-night-19-ref",
+      "league": "wds-fight-night-19",
+      "kind": "referee",
+      "name": "Deepak Salvi",
+      "contactNo": "9876543215",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-rising-star-8-judge-poonam-deshmukh",
+      "league": "wds-rising-star-8",
+      "kind": "judge",
+      "name": "Poonam Deshmukh",
+      "contactNo": "9876543212",
+      "bloodGroup": "B+"
+    },
+    {
+      "id": "wds-rising-star-8-judge-ayush-kulkarni",
+      "league": "wds-rising-star-8",
+      "kind": "judge",
+      "name": "Ayush Kulkarni",
+      "contactNo": "9876543213",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-rising-star-8-judge-sandeep-rawat",
+      "league": "wds-rising-star-8",
+      "kind": "judge",
+      "name": "Sandeep Rawat",
+      "contactNo": "9876543214",
+      "bloodGroup": "A+"
+    },
+    {
+      "id": "wds-rising-star-8-ref",
+      "league": "wds-rising-star-8",
+      "kind": "referee",
+      "name": "Deepak Salvi",
+      "contactNo": "9876543215",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-fight-night-18-judge-poonam-deshmukh",
+      "league": "wds-fight-night-18",
+      "kind": "judge",
+      "name": "Poonam Deshmukh",
+      "contactNo": "9876543212",
+      "bloodGroup": "B+"
+    },
+    {
+      "id": "wds-fight-night-18-judge-ayush-kulkarni",
+      "league": "wds-fight-night-18",
+      "kind": "judge",
+      "name": "Ayush Kulkarni",
+      "contactNo": "9876543213",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-fight-night-18-judge-sandeep-rawat",
+      "league": "wds-fight-night-18",
+      "kind": "judge",
+      "name": "Sandeep Rawat",
+      "contactNo": "9876543214",
+      "bloodGroup": "A+"
+    },
+    {
+      "id": "wds-fight-night-18-ref",
+      "league": "wds-fight-night-18",
+      "kind": "referee",
+      "name": "Deepak Salvi",
+      "contactNo": "9876543215",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-rising-star-7-judge-poonam-deshmukh",
+      "league": "wds-rising-star-7",
+      "kind": "judge",
+      "name": "Poonam Deshmukh",
+      "contactNo": "9876543212",
+      "bloodGroup": "B+"
+    },
+    {
+      "id": "wds-rising-star-7-judge-ayush-kulkarni",
+      "league": "wds-rising-star-7",
+      "kind": "judge",
+      "name": "Ayush Kulkarni",
+      "contactNo": "9876543213",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-rising-star-7-judge-sandeep-rawat",
+      "league": "wds-rising-star-7",
+      "kind": "judge",
+      "name": "Sandeep Rawat",
+      "contactNo": "9876543214",
+      "bloodGroup": "A+"
+    },
+    {
+      "id": "wds-rising-star-7-ref",
+      "league": "wds-rising-star-7",
+      "kind": "referee",
+      "name": "Deepak Salvi",
+      "contactNo": "9876543215",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-fight-night-17-judge-poonam-deshmukh",
+      "league": "wds-fight-night-17",
+      "kind": "judge",
+      "name": "Poonam Deshmukh",
+      "contactNo": "9876543212",
+      "bloodGroup": "B+"
+    },
+    {
+      "id": "wds-fight-night-17-judge-ayush-kulkarni",
+      "league": "wds-fight-night-17",
+      "kind": "judge",
+      "name": "Ayush Kulkarni",
+      "contactNo": "9876543213",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-fight-night-17-judge-sandeep-rawat",
+      "league": "wds-fight-night-17",
+      "kind": "judge",
+      "name": "Sandeep Rawat",
+      "contactNo": "9876543214",
+      "bloodGroup": "A+"
+    },
+    {
+      "id": "wds-fight-night-17-ref",
+      "league": "wds-fight-night-17",
+      "kind": "referee",
+      "name": "Deepak Salvi",
+      "contactNo": "9876543215",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-rising-star-6-judge-poonam-deshmukh",
+      "league": "wds-rising-star-6",
+      "kind": "judge",
+      "name": "Poonam Deshmukh",
+      "contactNo": "9876543212",
+      "bloodGroup": "B+"
+    },
+    {
+      "id": "wds-rising-star-6-judge-ayush-kulkarni",
+      "league": "wds-rising-star-6",
+      "kind": "judge",
+      "name": "Ayush Kulkarni",
+      "contactNo": "9876543213",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-rising-star-6-judge-sandeep-rawat",
+      "league": "wds-rising-star-6",
+      "kind": "judge",
+      "name": "Sandeep Rawat",
+      "contactNo": "9876543214",
+      "bloodGroup": "A+"
+    },
+    {
+      "id": "wds-rising-star-6-ref",
+      "league": "wds-rising-star-6",
+      "kind": "referee",
+      "name": "Deepak Salvi",
+      "contactNo": "9876543215",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-fight-night-16-judge-poonam-deshmukh",
+      "league": "wds-fight-night-16",
+      "kind": "judge",
+      "name": "Poonam Deshmukh",
+      "contactNo": "9876543212",
+      "bloodGroup": "B+"
+    },
+    {
+      "id": "wds-fight-night-16-judge-ayush-kulkarni",
+      "league": "wds-fight-night-16",
+      "kind": "judge",
+      "name": "Ayush Kulkarni",
+      "contactNo": "9876543213",
+      "bloodGroup": "O+"
+    },
+    {
+      "id": "wds-fight-night-16-judge-sandeep-rawat",
+      "league": "wds-fight-night-16",
+      "kind": "judge",
+      "name": "Sandeep Rawat",
+      "contactNo": "9876543214",
+      "bloodGroup": "A+"
+    },
+    {
+      "id": "wds-fight-night-16-ref",
+      "league": "wds-fight-night-16",
+      "kind": "referee",
+      "name": "Deepak Salvi",
+      "contactNo": "9876543215",
+      "bloodGroup": "O+"
+    }
+  ],
+  "bouts": [
+    {
+      "id": "wds-fight-night-19-bout-1",
+      "league": "wds-fight-night-19",
+      "boutNo": 1,
+      "boutName": "Flyweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-12-12",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-19-arjun-rane",
+      "redFighter": "wds-fight-night-19-kabir-shaikh",
+      "judges": [
+        "wds-fight-night-19-judge-poonam-deshmukh",
+        "wds-fight-night-19-judge-ayush-kulkarni",
+        "wds-fight-night-19-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-19-ref",
+      "result": null
+    },
+    {
+      "id": "wds-fight-night-19-bout-2",
+      "league": "wds-fight-night-19",
+      "boutNo": 2,
+      "boutName": "Bantamweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-12-12",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-19-rohit-tamang",
+      "redFighter": "wds-fight-night-19-imran-qureshi",
+      "judges": [
+        "wds-fight-night-19-judge-poonam-deshmukh",
+        "wds-fight-night-19-judge-ayush-kulkarni",
+        "wds-fight-night-19-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-19-ref",
+      "result": null
+    },
+    {
+      "id": "wds-fight-night-19-bout-3",
+      "league": "wds-fight-night-19",
+      "boutNo": 3,
+      "boutName": "Women's Strawweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-12-12",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-19-neha-salunkhe",
+      "redFighter": "wds-fight-night-19-priya-naik",
+      "judges": [
+        "wds-fight-night-19-judge-poonam-deshmukh",
+        "wds-fight-night-19-judge-ayush-kulkarni",
+        "wds-fight-night-19-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-19-ref",
+      "result": null
+    },
+    {
+      "id": "wds-fight-night-19-bout-4",
+      "league": "wds-fight-night-19",
+      "boutNo": 4,
+      "boutName": "Lightweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-12-12",
+      "ringNo": 1,
+      "totalRounds": 5,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-19-tomas-rivera",
+      "redFighter": "wds-fight-night-19-yusuf-demir",
+      "judges": [
+        "wds-fight-night-19-judge-poonam-deshmukh",
+        "wds-fight-night-19-judge-ayush-kulkarni",
+        "wds-fight-night-19-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-19-ref",
+      "result": null
+    },
+    {
+      "id": "wds-rising-star-8-bout-1",
+      "league": "wds-rising-star-8",
+      "boutNo": 1,
+      "boutName": "Amateur Flyweight",
+      "boutType": "Amateur",
+      "discipline": "MMA",
+      "boutDate": "2026-10-24",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 180,
+      "blueFighter": "wds-rising-star-8-aditya-pawar",
+      "redFighter": "wds-rising-star-8-sameer-joshi",
+      "judges": [
+        "wds-rising-star-8-judge-poonam-deshmukh",
+        "wds-rising-star-8-judge-ayush-kulkarni",
+        "wds-rising-star-8-judge-sandeep-rawat"
+      ],
+      "referee": "wds-rising-star-8-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "TKO",
+        "endedRound": 2,
+        "endedAtSec": 143
+      }
+    },
+    {
+      "id": "wds-rising-star-8-bout-2",
+      "league": "wds-rising-star-8",
+      "boutNo": 2,
+      "boutName": "Amateur Bantamweight",
+      "boutType": "Amateur",
+      "discipline": "MMA",
+      "boutDate": "2026-10-24",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 180,
+      "blueFighter": "wds-rising-star-8-vikram-shinde",
+      "redFighter": "wds-rising-star-8-faizan-ansari",
+      "judges": [
+        "wds-rising-star-8-judge-poonam-deshmukh",
+        "wds-rising-star-8-judge-ayush-kulkarni",
+        "wds-rising-star-8-judge-sandeep-rawat"
+      ],
+      "referee": "wds-rising-star-8-ref",
+      "result": {
+        "winnerCorner": "red",
+        "method": "Unanimous Decision",
+        "endedRound": 3,
+        "endedAtSec": 180
+      }
+    },
+    {
+      "id": "wds-rising-star-8-bout-3",
+      "league": "wds-rising-star-8",
+      "boutNo": 3,
+      "boutName": "Amateur BJJ Lightweight",
+      "boutType": "Amateur",
+      "discipline": "BJJ",
+      "boutDate": "2026-10-24",
+      "ringNo": 1,
+      "totalRounds": 1,
+      "roundDurationSec": 360,
+      "blueFighter": "wds-rising-star-8-karan-dhanda",
+      "redFighter": "wds-rising-star-8-mehul-rathod",
+      "judges": [
+        "wds-rising-star-8-judge-poonam-deshmukh",
+        "wds-rising-star-8-judge-ayush-kulkarni",
+        "wds-rising-star-8-judge-sandeep-rawat"
+      ],
+      "referee": "wds-rising-star-8-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "Submission",
+        "endedRound": 1,
+        "endedAtSec": 221
+      }
+    },
+    {
+      "id": "wds-fight-night-18-bout-1",
+      "league": "wds-fight-night-18",
+      "boutNo": 1,
+      "boutName": "Welterweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-08-29",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-18-harsh-vardhan",
+      "redFighter": "wds-fight-night-18-suraj-gurung",
+      "judges": [
+        "wds-fight-night-18-judge-poonam-deshmukh",
+        "wds-fight-night-18-judge-ayush-kulkarni",
+        "wds-fight-night-18-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-18-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "Head KO",
+        "endedRound": 1,
+        "endedAtSec": 97
+      }
+    },
+    {
+      "id": "wds-fight-night-18-bout-2",
+      "league": "wds-fight-night-18",
+      "boutNo": 2,
+      "boutName": "Featherweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-08-29",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-18-anil-chauhan",
+      "redFighter": "wds-fight-night-18-ravi-teja",
+      "judges": [
+        "wds-fight-night-18-judge-poonam-deshmukh",
+        "wds-fight-night-18-judge-ayush-kulkarni",
+        "wds-fight-night-18-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-18-ref",
+      "result": {
+        "winnerCorner": "red",
+        "method": "Split Decision",
+        "endedRound": 3,
+        "endedAtSec": 300
+      }
+    },
+    {
+      "id": "wds-fight-night-18-bout-3",
+      "league": "wds-fight-night-18",
+      "boutNo": 3,
+      "boutName": "Women's Flyweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-08-29",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-18-shraddha-more",
+      "redFighter": "wds-fight-night-18-ritika-bose",
+      "judges": [
+        "wds-fight-night-18-judge-poonam-deshmukh",
+        "wds-fight-night-18-judge-ayush-kulkarni",
+        "wds-fight-night-18-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-18-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "Unanimous Decision",
+        "endedRound": 3,
+        "endedAtSec": 300
+      }
+    },
+    {
+      "id": "wds-rising-star-7-bout-1",
+      "league": "wds-rising-star-7",
+      "boutNo": 1,
+      "boutName": "Amateur Lightweight",
+      "boutType": "Amateur",
+      "discipline": "MMA",
+      "boutDate": "2026-07-25",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 180,
+      "blueFighter": "wds-rising-star-7-omkar-jadhav",
+      "redFighter": "wds-rising-star-7-rizwan-shaikh",
+      "judges": [
+        "wds-rising-star-7-judge-poonam-deshmukh",
+        "wds-rising-star-7-judge-ayush-kulkarni",
+        "wds-rising-star-7-judge-sandeep-rawat"
+      ],
+      "referee": "wds-rising-star-7-ref",
+      "result": {
+        "winnerCorner": "red",
+        "method": "RNC",
+        "endedRound": 2,
+        "endedAtSec": 112
+      }
+    },
+    {
+      "id": "wds-rising-star-7-bout-2",
+      "league": "wds-rising-star-7",
+      "boutNo": 2,
+      "boutName": "Amateur Welterweight",
+      "boutType": "Amateur",
+      "discipline": "MMA",
+      "boutDate": "2026-07-25",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 180,
+      "blueFighter": "wds-rising-star-7-prathamesh-kale",
+      "redFighter": "wds-rising-star-7-gagan-deep",
+      "judges": [
+        "wds-rising-star-7-judge-poonam-deshmukh",
+        "wds-rising-star-7-judge-ayush-kulkarni",
+        "wds-rising-star-7-judge-sandeep-rawat"
+      ],
+      "referee": "wds-rising-star-7-ref",
+      "result": {
+        "winnerCorner": "red",
+        "method": "Unanimous Decision",
+        "endedRound": 3,
+        "endedAtSec": 180
+      }
+    },
+    {
+      "id": "wds-fight-night-17-bout-1",
+      "league": "wds-fight-night-17",
+      "boutNo": 1,
+      "boutName": "Middleweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-06-06",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-17-jaskaran-singh",
+      "redFighter": "wds-fight-night-17-daniel-costa",
+      "judges": [
+        "wds-fight-night-17-judge-poonam-deshmukh",
+        "wds-fight-night-17-judge-ayush-kulkarni",
+        "wds-fight-night-17-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-17-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "Submission",
+        "endedRound": 2,
+        "endedAtSec": 254
+      }
+    },
+    {
+      "id": "wds-fight-night-17-bout-2",
+      "league": "wds-fight-night-17",
+      "boutNo": 2,
+      "boutName": "Lightweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-06-06",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-17-tomas-rivera",
+      "redFighter": "wds-fight-night-17-yusuf-demir",
+      "judges": [
+        "wds-fight-night-17-judge-poonam-deshmukh",
+        "wds-fight-night-17-judge-ayush-kulkarni",
+        "wds-fight-night-17-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-17-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "Split Decision",
+        "endedRound": 3,
+        "endedAtSec": 300
+      }
+    },
+    {
+      "id": "wds-fight-night-17-bout-3",
+      "league": "wds-fight-night-17",
+      "boutNo": 3,
+      "boutName": "Catchweight K1",
+      "boutType": "Professional",
+      "discipline": "K1",
+      "boutDate": "2026-06-06",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 180,
+      "blueFighter": "wds-fight-night-17-akash-yadav",
+      "redFighter": "wds-fight-night-17-tenzin-norbu",
+      "judges": [
+        "wds-fight-night-17-judge-poonam-deshmukh",
+        "wds-fight-night-17-judge-ayush-kulkarni",
+        "wds-fight-night-17-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-17-ref",
+      "result": {
+        "winnerCorner": "red",
+        "method": "KO Body",
+        "endedRound": 2,
+        "endedAtSec": 71
+      }
+    },
+    {
+      "id": "wds-rising-star-6-bout-1",
+      "league": "wds-rising-star-6",
+      "boutNo": 1,
+      "boutName": "Amateur Featherweight",
+      "boutType": "Amateur",
+      "discipline": "MMA",
+      "boutDate": "2026-04-25",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 180,
+      "blueFighter": "wds-rising-star-6-nikhil-patil",
+      "redFighter": "wds-rising-star-6-zaid-memon",
+      "judges": [
+        "wds-rising-star-6-judge-poonam-deshmukh",
+        "wds-rising-star-6-judge-ayush-kulkarni",
+        "wds-rising-star-6-judge-sandeep-rawat"
+      ],
+      "referee": "wds-rising-star-6-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "TKO",
+        "endedRound": 3,
+        "endedAtSec": 64
+      }
+    },
+    {
+      "id": "wds-rising-star-6-bout-2",
+      "league": "wds-rising-star-6",
+      "boutNo": 2,
+      "boutName": "Amateur BJJ Middleweight",
+      "boutType": "Amateur",
+      "discipline": "BJJ",
+      "boutDate": "2026-04-25",
+      "ringNo": 1,
+      "totalRounds": 1,
+      "roundDurationSec": 360,
+      "blueFighter": "wds-rising-star-6-rahul-verma",
+      "redFighter": "wds-rising-star-6-siddharth-rao",
+      "judges": [
+        "wds-rising-star-6-judge-poonam-deshmukh",
+        "wds-rising-star-6-judge-ayush-kulkarni",
+        "wds-rising-star-6-judge-sandeep-rawat"
+      ],
+      "referee": "wds-rising-star-6-ref",
+      "result": {
+        "winnerCorner": "red",
+        "method": "Submission",
+        "endedRound": 1,
+        "endedAtSec": 188
+      }
+    },
+    {
+      "id": "wds-fight-night-16-bout-1",
+      "league": "wds-fight-night-16",
+      "boutNo": 1,
+      "boutName": "Bantamweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-03-28",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-16-manpreet-brar",
+      "redFighter": "wds-fight-night-16-rohit-tamang",
+      "judges": [
+        "wds-fight-night-16-judge-poonam-deshmukh",
+        "wds-fight-night-16-judge-ayush-kulkarni",
+        "wds-fight-night-16-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-16-ref",
+      "result": {
+        "winnerCorner": "blue",
+        "method": "Unanimous Decision",
+        "endedRound": 3,
+        "endedAtSec": 300
+      }
+    },
+    {
+      "id": "wds-fight-night-16-bout-2",
+      "league": "wds-fight-night-16",
+      "boutNo": 2,
+      "boutName": "Welterweight",
+      "boutType": "Professional",
+      "discipline": "MMA",
+      "boutDate": "2026-03-28",
+      "ringNo": 1,
+      "totalRounds": 3,
+      "roundDurationSec": 300,
+      "blueFighter": "wds-fight-night-16-gurpreet-sandhu",
+      "redFighter": "wds-fight-night-16-harsh-vardhan",
+      "judges": [
+        "wds-fight-night-16-judge-poonam-deshmukh",
+        "wds-fight-night-16-judge-ayush-kulkarni",
+        "wds-fight-night-16-judge-sandeep-rawat"
+      ],
+      "referee": "wds-fight-night-16-ref",
+      "result": {
+        "winnerCorner": "red",
+        "method": "DQ",
+        "endedRound": 2,
+        "endedAtSec": 205
+      }
+    }
+  ]
+}

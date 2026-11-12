@@ -9,11 +9,6 @@ import fighterRoutes from './routes/fighter.routes.js';
 import officialRoutes from './routes/official.routes.js';
 import boutRoutes from './routes/bout.routes.js';
 import fightRoutes from './routes/fight.routes.js';
-import { tournamentRouter, divisionRouter, registrationRouter } from './routes/tournament.routes.js';
-import academyRoutes from './routes/academy.routes.js';
-import athleteRoutes from './routes/athlete.routes.js';
-import matchRoutes from './routes/match.routes.js';
-import rankingRoutes from './routes/ranking.routes.js';
 import { notFound, errorHandler } from './middleware/error.js';
 
 export function createApp() {
@@ -37,15 +32,6 @@ export function createApp() {
   app.use('/api/bouts', boutRoutes);
   // Analytics layer — separate namespace so the judge endpoints are untouched.
   app.use('/api/fights', fightRoutes);
-
-  // Tournament module — events, divisions, registration, brackets, mats, rankings.
-  app.use('/api/tournaments', tournamentRouter);
-  app.use('/api/divisions', divisionRouter);
-  app.use('/api/registrations', registrationRouter);
-  app.use('/api/academies', academyRoutes);
-  app.use('/api/athletes', athleteRoutes);
-  app.use('/api/matches', matchRoutes);
-  app.use('/api/rankings', rankingRoutes);
 
   app.use(notFound);
   app.use(errorHandler);
