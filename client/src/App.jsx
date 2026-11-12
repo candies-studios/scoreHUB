@@ -10,6 +10,8 @@ import BoutList from './pages/BoutList.jsx';
 import BoutForm from './pages/BoutForm.jsx';
 import LiveScoring from './pages/LiveScoring.jsx';
 import Scoreboard from './pages/Scoreboard.jsx';
+import FightAnalytics from './pages/analytics/FightAnalytics.jsx';
+import PublicFight from './pages/analytics/PublicFight.jsx';
 
 export default function App() {
   return (
@@ -32,6 +34,10 @@ export default function App() {
 
         <Route path="bouts/:boutId/score" element={<LiveScoring />} />
         <Route path="bouts/:boutId/summary" element={<Scoreboard />} />
+
+        {/* Fight analytics — Engine A recording + Engine B estimates. */}
+        <Route path="bouts/:boutId/analytics" element={<FightAnalytics />} />
+        <Route path="bouts/:boutId/live" element={<PublicFight />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

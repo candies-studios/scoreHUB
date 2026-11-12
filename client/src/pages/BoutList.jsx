@@ -59,9 +59,21 @@ export default function BoutList() {
     { key: 'boutType', label: 'Bout Type' },
     {
       key: 'score',
-      label: 'Score',
-      render: (r) => (r.status === 'completed' ? 'Locked' : 'Open sheet'),
+      label: 'Judges',
+      render: (r) => (r.status === 'completed' ? 'Locked' : 'Memory sheet'),
       onClick: (r) => navigate(`/bouts/${r._id}/score`),
+    },
+    {
+      key: 'analytics',
+      label: 'Analytics',
+      render: () => 'Fight stats',
+      onClick: (r) => navigate(`/bouts/${r._id}/analytics`),
+    },
+    {
+      key: 'live',
+      label: 'Public',
+      render: () => 'Live page',
+      onClick: (r) => navigate(`/bouts/${r._id}/live`),
     },
     {
       key: 'edit',

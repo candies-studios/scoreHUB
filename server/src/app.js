@@ -8,6 +8,7 @@ import leagueRoutes from './routes/league.routes.js';
 import fighterRoutes from './routes/fighter.routes.js';
 import officialRoutes from './routes/official.routes.js';
 import boutRoutes from './routes/bout.routes.js';
+import fightRoutes from './routes/fight.routes.js';
 import { notFound, errorHandler } from './middleware/error.js';
 
 export function createApp() {
@@ -29,6 +30,8 @@ export function createApp() {
   app.use('/api/fighters', fighterRoutes);
   app.use('/api/officials', officialRoutes);
   app.use('/api/bouts', boutRoutes);
+  // Analytics layer — separate namespace so the judge endpoints are untouched.
+  app.use('/api/fights', fightRoutes);
 
   app.use(notFound);
   app.use(errorHandler);

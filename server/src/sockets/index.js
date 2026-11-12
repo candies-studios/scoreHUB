@@ -22,6 +22,7 @@ import {
   submitRound,
   buildSummary,
 } from '../utils/scoring.js';
+import registerFightHandlers from './fightHandlers.js';
 
 export function initSockets(httpServer) {
   const io = new Server(httpServer, {
@@ -33,6 +34,10 @@ export function initSockets(httpServer) {
     socket.data.boutId = null;
     socket.data.judgeId = null;
     socket.data.seat = null;
+
+    // Analytics channel — its own rooms and event names, registered on the
+    // same connection so one socket can serve both if a client needs it.
+    registerFightHandlers(io, socket);
 
     const fail = (message) => socket.emit(EVT.ERROR, { message });
 
