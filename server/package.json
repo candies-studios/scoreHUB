@@ -8,7 +8,7 @@
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
     "seed": "node src/utils/seed.js",
-    "test": "node test/logic.test.mjs && node test/fight-stats.test.mjs && node test/scoring-engine.test.mjs",
+    "test": "node test/logic.test.mjs && node test/fight-stats.test.mjs && node test/scoring-engine.test.mjs && node test/roster.test.mjs && node test/seed-validation.test.mjs && node test/sync-parsers.test.mjs",
     "test:e2e": "node test/integration.test.mjs"
   },
   "dependencies": {

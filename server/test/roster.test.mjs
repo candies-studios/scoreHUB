@@ -1,7 +1,7 @@
 /**
  * Roster integrity.
  *
- * The same JSON feeds the MongoDB seed and the client's offline demo, so a
+ * The same JSON feeds the MongoDB seed and the client's read-only mode, so a
  * broken reference here breaks both at once — and only at runtime. These
  * checks catch it at test time instead.
  */

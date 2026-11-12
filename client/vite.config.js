@@ -9,7 +9,14 @@ export default defineConfig(({ mode }) => {
   const localEnv = loadEnv(mode, process.cwd(), '');
   const env = { ...rootEnv, ...localEnv };
 
-  const apiUrl = process.env.VITE_API_URL || env.VITE_API_URL || 'http://localhost:5000';
+  /**
+   * An EXPLICITLY EMPTY VITE_API_URL means "no backend — run read-only",
+   * which is a real deployment state, not a mistake. So distinguish "unset"
+   * from "set to empty": `||` would collapse the two and quietly point a read-only
+   * build at localhost, which looks to the user like a broken site.
+   */
+  const explicit = process.env.VITE_API_URL ?? env.VITE_API_URL;
+  const apiUrl = explicit === undefined ? 'http://localhost:5000' : explicit;
 
   // GitHub Pages serves a project site from /<repo>/, so the bundle needs that
   // prefix. Left unset (local dev, Netlify, Vercel, nginx) it stays at the root.

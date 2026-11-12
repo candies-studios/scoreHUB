@@ -2,14 +2,38 @@ import mongoose from 'mongoose';
 
 export const BOUT_TYPES = ['Professional', 'Amateur'];
 export const DISCIPLINES = ['MMA', 'BJJ', 'K1'];
+/**
+ * Every way a bout can end.
+ *
+ * Two vocabularies meet here and both must be accepted, or a result is
+ * rejected at save time and a finished bout looks like it never happened:
+ *
+ *   - the judges' memory sheet records the referee's call precisely
+ *     ("Head KO", "KO Body", "RNC", "DQ")
+ *   - the official-result form uses the announcer's wording
+ *     ("Unanimous Decision", "Split Decision", …)
+ *
+ * Keep this in step with RESULT_METHODS in client/src/utils/fightConstants.js;
+ * a test asserts the schema accepts every value that form can submit.
+ */
 export const FINISH_METHODS = [
+  // Decisions
   'Decision',
+  'Unanimous Decision',
+  'Split Decision',
+  'Majority Decision',
+  'Technical Decision',
+  'Draw',
+  // Finishes
+  'KO',
   'Head KO',
   'KO Body',
   'TKO',
   'RNC',
   'Submission',
+  // Everything else
   'DQ',
+  'Disqualification',
   'No Contest',
 ];
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import useFightSocket from '../../hooks/useFightSocket.js';
 import { fightApi } from '../../api/fightApi.js';
-import { errMsg } from '../../api/client.js';
+import { errMsg, READ_ONLY } from '../../api/client.js';
 import CornerPad from './CornerPad.jsx';
 import LiveStats from './LiveStats.jsx';
 import RoundIntelligence from './RoundIntelligence.jsx';
@@ -142,6 +142,10 @@ export default function FightAnalytics() {
     actions.result(resultForm);
     setLocalError('');
   };
+
+  if (READ_ONLY) {
+    return <AnalyticsOfflineNotice onBack={() => navigate(-1)} />;
+  }
 
   if (!snapshot) {
     return (
@@ -480,6 +484,27 @@ function RecentFeed({ boutId, roundNo, canEdit, redName, blueName, refreshKey })
         Undo needs a reason and soft-deletes the entry. Statistics are recalculated from the
         remaining events, so nothing is ever double counted or silently rewritten.
       </p>
+    </div>
+  );
+}
+
+/** The analytics engine is server-side; there is nothing to emulate offline. */
+function AnalyticsOfflineNotice({ onBack }) {
+  return (
+    <div className="fa">
+      <div className="fa-panel" style={{ maxWidth: 640, margin: '20px auto', textAlign: 'center' }}>
+        <h3>Fight analytics needs the API</h3>
+        <p className="fa-note" style={{ lineHeight: 1.7 }}>
+          This site is <strong>read-only</strong> — no backend is connected. The events,
+          fighters and bouts are the real wdsmma.com data, but recording live statistics
+          and the estimated round scoring engine both run on the server.
+        </p>
+        <p className="fa-note" style={{ lineHeight: 1.7 }}>
+          Deploy the API (see <code>render.yaml</code>) and set the <code>API_URL</code>{' '}
+          repository variable to enable it.
+        </p>
+        <button className="fa-btn" onClick={onBack} style={{ marginTop: 10 }}>Back</button>
+      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ All the event data lives in **one file**:
 client/public/data/wds-roster.json
 ```
 
-The MongoDB seed reads it, and the client's offline demo mode reads the very
+The MongoDB seed reads it, and the client's offline read-only mode reads the very
 same file. Change it once and both follow.
 
 ---
@@ -122,18 +122,20 @@ League shows real outcomes rather than empty cards.
 ## Past vs upcoming
 
 Nothing marks an event as past or upcoming. `GET /api/leagues?scope=past|upcoming`
-compares the event **date** with today, and the demo backend does the same. So an
+compares the event **date** with today, and read-only mode does the same. So an
 event moves from Upcoming League to Past League on its own, the morning after it
 runs.
 
 ---
 
-## Demo mode
+## Read-only mode
 
 With no `API_URL` set, the client serves the browsing screens from this JSON and
-shows an orange banner saying so.
+shows a blue read-only banner saying so. The data on screen is the real
+wdsmma.com card either way — read-only refers to the missing backend, not to
+the events.
 
-| | Demo mode | With a backend |
+| | Read-only (no API) | With the API |
 |---|---|---|
 | Browse events, fighters, bouts | ✅ | ✅ |
 | Fighter photos | ✅ | ✅ |
@@ -142,6 +144,6 @@ shows an orange banner saying so.
 | Judge memory sheet | ❌ | ✅ |
 | Live stats & scoring engine | ❌ | ✅ |
 
-Demo mode is a legitimate way to publish — the site says what it is rather than
+Read-only mode is a legitimate way to publish — the site says what it is rather than
 appearing broken. To connect a real backend, set the `API_URL` repository
 variable (see the Deploying section of the README).

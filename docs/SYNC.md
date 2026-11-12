@@ -110,7 +110,7 @@ tools/wds-source.mjs          the captured data, in version control
     │  build-roster.mjs
     ▼
 client/public/data/wds-roster.json
-    ├──► the client reads it directly in demo mode
+    ├──► the client reads it directly in read-only mode
     └──► the server seeds MongoDB from it on first boot
 ```
 
