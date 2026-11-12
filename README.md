@@ -22,6 +22,20 @@ scoring engine needs to keep three separate scorecards.
 > venue LAN. Don't put an event you care about on a public URL without putting something
 > in front of it — see [Locking it down](#locking-it-down).
 
+## Tournaments (new)
+
+Besides fight-night leagues, ScoreHub now runs **open-entry tournaments** the way
+Smoothcomp does: event pages with online registration, divisions by age / gender / belt /
+weight, automatic brackets (team-mates kept apart, byes to seeds, round robin for small
+divisions), mat scheduling, a live BJJ scoreboard with a TV display for every mat, results
+with academy medal tables, and athlete / academy profiles and rankings.
+
+```bash
+npm run seed:events   # demo academies, athletes, a finished event and an open one
+```
+
+Then open http://localhost:5173/events. Full guide: **[docs/TOURNAMENTS.md](docs/TOURNAMENTS.md)**.
+
 ## Stack
 
 | Layer     | Choice |

@@ -2,7 +2,7 @@
   "name": "scorehub",
   "version": "1.0.0",
   "private": true,
-  "description": "ScoreHub — real-time combat sports league management and multi-judge live scoring platform (MMA / BJJ / K1).",
+  "description": "ScoreHub \u2014 real-time combat sports league management and multi-judge live scoring platform (MMA / BJJ / K1).",
   "license": "MIT",
   "workspaces": [
     "server",
@@ -17,7 +17,9 @@
     "seed": "npm --workspace server run seed",
     "test": "npm --workspace server run test",
     "test:e2e": "npm --workspace server run test:e2e",
-    "lint": "npm --workspace client run lint"
+    "lint": "npm --workspace client run lint",
+    "seed:events": "npm --workspace server run seed:events",
+    "test:events": "npm --workspace server run test:events"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

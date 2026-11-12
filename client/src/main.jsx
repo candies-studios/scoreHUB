@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './styles/global.css';
+import './styles/events.css';
 
 // On GitHub Pages the app is served from /<repo>/, so the router needs that
 // prefix. Vite sets BASE_URL from the `base` option; it is '/' everywhere else.
