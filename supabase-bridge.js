@@ -490,9 +490,13 @@
       must(await sb.from('official_invites').delete().eq('email', decodeURIComponent(p[0].slice(7))));
       return { deactivated: p[0] };
     }
-    var upd = must(await sb.from('profiles').update({ active: false }).eq('id', p[0]).select('id'));
-    if (!upd.length) throw HttpError('Only an admin can deactivate officials', 403);
-    return { deactivated: p[0] };
+    // Deleted from the database, unless they have judges' scorecards (then made inactive: see 006_delete_officials.sql).
+    var res = must(await sb.rpc('delete_official', { p_id: p[0] }));
+    if (res && res.deleted === false) {
+      throw HttpError((res.name || 'This official') + ' has submitted ' + res.cards + ' judge scorecard' + (res.cards === 1 ? '' : 's') +
+        ', so they cannot be deleted (it would erase those cards from past bouts). They have been made inactive instead.', 409);
+    }
+    return { deleted: p[0] };
   });
 
   // leagues (= WDS events)

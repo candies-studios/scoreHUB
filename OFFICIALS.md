@@ -49,3 +49,17 @@ These changes are made directly in the built app inside `index.html`, because
 `src/` in this repo is older than the live app (it lacks the newer scoring criteria
 and other changes). Do not rebuild `index.html` from `src/` without first porting
 those changes back to `src/`.
+
+## Deleting an official
+
+Officials → **Edit** → **Delete official**:
+
+- **Never submitted a judge's scorecard:** the official is deleted from the database,
+  including their login, PIN, profile and invite. They disappear from the list, and the
+  same email can be added again later. Bouts they refereed keep their results.
+- **Has submitted scorecards:** they can't be deleted, because that would erase their
+  cards from past bouts. They are made inactive instead (they can no longer sign in),
+  and a message says so.
+- You can't delete yourself or the last active admin.
+
+Needs `config/migrations/006_delete_officials.sql`.
