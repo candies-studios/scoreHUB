@@ -11,6 +11,7 @@ the bundled app in `index.html` is byte-for-byte unchanged.
 | `supabase-bridge.js` | **new** — answers ScoreHUB's own API (`/api/leagues`, `/api/bouts/:id/rounds`, …) and its live-sync socket from Supabase |
 | `vendor/supabase.js` | **new** — supabase-js 2.117.2 (served locally, no CDN dependency at the venue) |
 | `config/migrations/001_init_schema.sql` | superseded; do not run (see header) |
+| `strike-sheet.html`, `fight-stats.js`, `config/migrations/002_fight_stats.sql`, `003_strike_sheet_and_rankings.sql` | **Strike Sheet** — live strike/grappling stats by assigned stat counters; feeds the rankings (see `FIGHT-STATS.md`) |
 
 Remove the two config keys to return ScoreHUB to its in-browser mode.
 

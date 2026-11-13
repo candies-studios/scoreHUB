@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="ScoreHUB Strike Sheet — live strike and grappling stats for WDS bouts." />
+  <link rel="icon" href="client/public/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" />
+  <title>Strike Sheet · ScoreHUB</title>
+
+  <script>
+    // Same WDS database as index.html. Keep these two values in step with the
+    // config block in index.html. The anon key is public by design; Row Level
+    // Security decides what each signed-in official can do.
+    window.__SCOREHUB_CONFIG__ = {
+      supabaseUrl: 'https://zxqaolyckzgaqohpiwtk.supabase.co',
+      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4cWFvbHlja3pnYXFvaHBpd3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTY2ODEsImV4cCI6MjEwNTg5MjY4MX0.hVyih4Jwx4Zi4tpB-2_5Hu0u7ktKEO6KReQPME8tzoA',
+      timezone: 'Asia/Kolkata',
+    };
+  </script>
+  <script src="vendor/supabase.js"></script>
+  <script>
+    (function () {
+      var cfg = window.__SCOREHUB_CONFIG__;
+      if (window.__WDS_SUPABASE__ || !window.supabase) return;   // a test harness may provide its own client
+      // Same storage key as ScoreHUB, so an official signed in there is signed in here too.
+      window.__WDS_SUPABASE__ = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+        auth: { persistSession: true, autoRefreshToken: true, storageKey: 'wds-scorehub-auth' },
+        realtime: { params: { eventsPerSecond: 20 } },
+      });
+    })();
+  </script>
+  <script src="fight-stats.js"></script>
+  <style>
+    :root { --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #04060d; color: #e2e8f0; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+    button, input { font: inherit; }
+    .ss-spot { background-image: radial-gradient(60% 55% at 50% 20%, #29b6ff22, #04060d00 70%); min-height: 100vh; }
+    .ss-wrap { max-width: 64rem; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
+    .ss-brand { font-weight: 900; letter-spacing: -.02em; font-size: 1.25rem; color: #fff; }
+    .ss-brand b { background: linear-gradient(90deg, #0b3fd4, #1580f5 55%, #29b6ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .ss-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-bottom: 1.25rem; }
+    .ss-bar .grow { flex: 1; }
+    .ss-who { font-size: .8125rem; color: #94a3b8; }
+    .ss-who strong { color: #e2e8f0; }
+    .ss-auth { max-width: 26rem; margin: 10vh auto 0; }
+    .ss-auth h1 { font-size: 1.5rem; margin: .75rem 0 .25rem; color: #fff; }
+    .ss-auth p { color: #94a3b8; font-size: .875rem; margin: 0 0 1.25rem; line-height: 1.5; }
+    label { display: block; font-size: .75rem; font-weight: 500; color: #94a3b8; padding: 0 1rem; margin: .75rem 0 .25rem; }
+    input[type=text], input[type=password], input[type=email], input[type=tel] {
+      width: 100%; border-radius: 9999px; border: 1px solid #1a2640; background: #0b1120; color: #f1f5f9;
+      padding: .625rem 1rem; font-size: .875rem; outline: none; }
+    input:focus { border-color: #29b6ff; box-shadow: 0 0 0 2px #29b6ff40; }
+    .ss-primary { width: 100%; margin-top: 1.25rem; border: 0; border-radius: 9999px; padding: .75rem 1.5rem; font-weight: 600; color: #fff; cursor: pointer;
+      background-image: linear-gradient(90deg, #0b3fd4, #1580f5 55%, #29b6ff); box-shadow: 0 0 24px -4px rgba(41,182,255,.45); }
+    .ss-primary:disabled { opacity: .5; cursor: default; }
+    .ss-err { margin-top: .75rem; color: #ff8fa6; font-size: .8125rem; min-height: 1.2em; }
+    .ss-ok { color: #6ee7b7; }
+    .ss-event { margin: 1.5rem 0 .5rem; font-size: .6875rem; letter-spacing: .14em; text-transform: uppercase; color: #29b6ff; font-weight: 800; }
+    .ss-bout { display: grid; grid-template-columns: 1fr auto; gap: .75rem 1rem; align-items: center; border-radius: 1rem; border: 1px solid #1a2640;
+      background: #070b16; padding: 1rem; margin-bottom: .625rem; }
+    .ss-bout.live { border-color: #10b98166; box-shadow: 0 0 24px -12px #10b981; }
+    .ss-bout h3 { margin: 0; font-size: .9375rem; color: #fff; }
+    .ss-bout .meta { font-size: .75rem; color: #94a3b8; margin-top: .25rem; }
+    .ss-bout .vs { margin-top: .375rem; font-size: .875rem; }
+    .ss-bout .vs .b { color: #7fb4ff; font-weight: 600; } .ss-bout .vs .r { color: #ff8fa6; font-weight: 600; }
+    .ss-bout .acts { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: flex-end; }
+    .ss-chip { display: inline-block; border-radius: 9999px; border: 1px solid #1a2640; padding: .125rem .5rem; font-size: .6875rem; color: #cbd5e1; margin: .375rem .25rem 0 0; }
+    .ss-chip.pending { border-style: dashed; color: #94a3b8; }
+    .ss-empty { text-align: center; color: #94a3b8; padding: 3rem 1rem; border: 1px dashed #1a2640; border-radius: 1rem; }
+    .ss-form { display: grid; gap: .5rem; grid-template-columns: 1fr; }
+    @media (min-width: 720px) { .ss-form { grid-template-columns: 1fr 1fr 1fr auto; align-items: end; } }
+    .ss-form label { margin-top: 0; }
+    .ss-modal-bg { position: fixed; inset: 0; z-index: 80; background: #04060dcc; backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .ss-modal { width: 100%; max-width: 28rem; max-height: 85vh; overflow: auto; border-radius: 1rem; border: 1px solid #1a2640; background: #070b16; padding: 1.5rem; box-shadow: 0 0 60px -10px rgba(41,182,255,.55); }
+    .ss-modal h2 { margin: 0 0 .25rem; font-size: 1.0625rem; color: #fff; }
+    .ss-modal p { margin: 0 0 1rem; font-size: .8125rem; color: #94a3b8; }
+    .ss-check { display: flex; align-items: center; gap: .75rem; padding: .625rem .75rem; border-radius: .75rem; border: 1px solid #1a2640; margin-bottom: .5rem; cursor: pointer; }
+    .ss-check input { width: 1.125rem; height: 1.125rem; accent-color: #1580f5; }
+    .ss-check small { display: block; color: #64748b; font-size: .6875rem; }
+    .ss-row { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="ss-spot"><div class="ss-wrap" id="app"></div></div>
+
+  <script>
+  (function () {
+    'use strict';
+    var sb = window.__WDS_SUPABASE__;
+    var FS = window.ScoreHUBFightStats;
+    var app = document.getElementById('app');
+    var PIN_MIN = 6;
+    var me = null;
+    var bouts = [];
+    var listTimer = null;
+    var flash = '';
+
+    if (FS) FS.injectCss();
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function norm(s) { return String(s || '').trim().replace(/\s+/g, ' ').toLowerCase(); }
+    function isStaff() { return me && (me.role === 'ADMIN' || me.role === 'PROMOTER'); }
+    var ROLE = { ADMIN: 'Admin', PROMOTER: 'Promoter', JUDGE: 'Judge', REFEREE: 'Referee', STATS: 'Stat Counter' };
+    function friendly(e) {
+      var m = (e && e.message) || String(e || 'Something went wrong');
+      if (/strike_sheet_bouts|list_stat_counters|bout_stat_counters/.test(m) && /exist|find/i.test(m)) {
+        return 'The Strike Sheet is not set up in the database yet (run config/migrations/003_strike_sheet_and_rankings.sql).';
+      }
+      if (e && e.code === '42501') return 'You do not have permission to do that.';
+      return m;
+    }
+
+    // ---------------------------------------------------------------- sign in
+    async function loadMe() {
+      var s = await sb.auth.getSession();
+      var uid = s && s.data && s.data.session ? s.data.session.user.id : null;
+      if (!uid) return null;
+      var r = await sb.from('profiles').select('id,name,email,role,active').eq('id', uid).maybeSingle();
+      if (r.error || !r.data || !r.data.active || !r.data.role) return null;
+      return r.data;
+    }
+
+    function renderSignIn(msg) {
+      stopList();
+      app.innerHTML =
+        '<div class="ss-auth"><div class="ss-brand">score<b>HUB</b></div>' +
+        '<h1>Strike Sheet</h1>' +
+        '<p>Stat counters and management sign in with their name and PIN. The first time you sign in, the PIN you choose becomes yours.</p>' +
+        '<form id="f" autocomplete="on">' +
+        '<label for="n">Your name</label><input id="n" type="text" autocomplete="name" required placeholder="As registered with WDS">' +
+        '<label for="p">PIN</label><input id="p" type="password" autocomplete="current-password" required minlength="' + PIN_MIN + '" placeholder="At least ' + PIN_MIN + ' characters">' +
+        '<button class="ss-primary" id="go" type="submit">Sign in</button>' +
+        '<div class="ss-err" id="err" role="alert">' + esc(msg || '') + '</div></form></div>';
+      document.getElementById('f').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        signIn(document.getElementById('n').value, document.getElementById('p').value);
+      });
+    }
+
+    async function signIn(name, pin) {
+      var err = document.getElementById('err');
+      var btn = document.getElementById('go');
+      err.textContent = '';
+      if (norm(name).length < 2) { err.textContent = 'Please enter your name.'; return; }
+      if (!pin || pin.length < PIN_MIN) { err.textContent = 'Enter your PIN (at least ' + PIN_MIN + ' characters).'; return; }
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      try {
+        var res = await sb.rpc('list_officials');
+        if (res.error) throw res.error;
+        var matches = (res.data || []).filter(function (o) { return norm(o.name) === norm(name); });
+        var person = matches.find(function (o) { return o.role === 'STATS'; }) || matches[0];
+        if (!person) throw new Error('No official named "' + name.trim() + '" is registered with WDS. Ask management to add you as a Stat Counter.');
+        await sb.auth.signOut({ scope: 'local' });
+        if (person.registered) {
+          var r = await sb.auth.signInWithPassword({ email: person.login_email, password: pin });
+          if (r.error) throw new Error('That PIN is not right for ' + person.name + '.');
+        } else {
+          var up = await sb.auth.signUp({ email: person.login_email, password: pin, options: { data: { name: person.name } } });
+          if (up.error) throw up.error;
+          if (!up.data.session) throw new Error('Account created. Confirm the email sent to ' + person.login_email + ', then sign in again with the same PIN.');
+        }
+        me = await loadMe();
+        if (!me) { await sb.auth.signOut({ scope: 'local' }); throw new Error('Your account is not active yet. Ask WDS management to check your role.'); }
+        route();
+      } catch (e) {
+        err.textContent = friendly(e);
+        btn.disabled = false; btn.textContent = 'Sign in';
+      }
+    }
+
+    async function signOut() {
+      stopList();
+      await sb.auth.signOut({ scope: 'local' });
+      me = null;
+      location.hash = '#/';
+      renderSignIn();
+    }
+
+    // ---------------------------------------------------------------- bout list
+    function stopList() { clearInterval(listTimer); listTimer = null; }
+
+    async function loadBouts() {
+      var r = await sb.rpc('strike_sheet_bouts');
+      if (r.error) throw r.error;
+      bouts = r.data || [];
+    }
+
+    function boutCard(b) {
+      var live = b.status === 'LIVE';
+      var status = b.status === 'LIVE' ? 'Live · R' + Math.max(1, b.current_round || 1)
+        : b.status === 'COMPLETED' ? (b.result_status === 'provisional' ? 'Finished · provisional' : 'Finished') : 'Not started';
+      var counters = (b.counters || []).map(function (c) {
+        return '<span class="ss-chip' + (c.registered ? '' : ' pending') + '" title="' + esc(c.email) + '">' + esc(c.name) + (c.registered ? '' : ' (invited)') + '</span>';
+      }).join('');
+      var canRecord = isStaff() || b.assigned;
+      return '<div class="ss-bout' + (live ? ' live' : '') + '">' +
+        '<div><h3>Bout ' + esc(b.bout_number) + (b.bout_name ? ' · ' + esc(b.bout_name) : '') + '</h3>' +
+        '<div class="vs"><span class="b">' + esc(b.blue_name || 'Blue corner') + '</span> vs <span class="r">' + esc(b.red_name || 'Red corner') + '</span></div>' +
+        '<div class="meta">' + esc(b.discipline) + ' · ' + esc(b.total_rounds) + ' rounds · <span class="fs-pill" style="padding:.125rem .5rem"><span class="fs-dot' + (live ? ' live' : '') + '"></span>' + esc(status) + '</span></div>' +
+        '<div>' + (counters || '<span class="ss-chip pending">No counters assigned</span>') + '</div></div>' +
+        '<div class="acts">' +
+        (isStaff() ? '<button class="fs-btn" data-counters="' + esc(b.id) + '">Counters</button>' : '') +
+        '<button class="fs-btn" data-open="' + esc(b.id) + '" style="' + (canRecord ? 'background-image:linear-gradient(90deg,#0b3fd4,#1580f5 55%,#29b6ff);border-color:transparent;color:#fff' : '') + '">' +
+        (canRecord ? 'Open Strike Sheet' : 'View') + '</button></div></div>';
+    }
+
+    function renderList(errMsg) {
+      var groups = {};
+      var order = [];
+      bouts.slice().sort(function (a, b) {
+        return (b.status === 'LIVE') - (a.status === 'LIVE');
+      }).forEach(function (b) {
+        var k = b.event_id;
+        if (!groups[k]) { groups[k] = { title: b.event_title, items: [] }; order.push(k); }
+        groups[k].items.push(b);
+      });
+      var body = order.map(function (k) {
+        return '<div class="ss-event">' + esc(groups[k].title) + '</div>' + groups[k].items.map(boutCard).join('');
+      }).join('');
+      if (!bouts.length) {
+        body = '<div class="ss-empty">' + (isStaff()
+          ? 'No upcoming or live bouts. Bouts appear here once they are on a card in ScoreHUB.'
+          : 'No bouts are assigned to you yet. Management assigns stat counters to each bout.') + '</div>';
+      }
+      var addForm = isStaff() ? (
+        '<div class="fs-card" style="margin-top:0"><h2>Add a stat counter</h2>' +
+        '<form class="ss-form" id="addf">' +
+        '<div><label for="an">Name</label><input id="an" type="text" required placeholder="Full name"></div>' +
+        '<div><label for="ae">Email</label><input id="ae" type="email" required placeholder="name@example.com"></div>' +
+        '<div><label for="ap">Phone (optional)</label><input id="ap" type="tel" placeholder="98xxxxxxxx"></div>' +
+        '<div><button class="fs-btn" type="submit" style="width:100%">Add</button></div></form>' +
+        '<div class="ss-err" id="adderr" role="status"></div>' +
+        '<p class="fs-note" style="margin-top:.25rem">They sign in on this page with their name and choose a PIN the first time. Then tap <strong>Counters</strong> on a bout to assign them.</p></div>'
+      ) : '';
+      app.innerHTML =
+        '<div class="ss-bar"><div class="ss-brand">score<b>HUB</b> <span style="font-weight:600;color:#94a3b8;font-size:.9375rem">Strike Sheet</span></div>' +
+        '<div class="grow"></div><div class="ss-who">Signed in as <strong>' + esc(me.name) + '</strong> · ' + esc(ROLE[me.role] || me.role) + '</div>' +
+        '<a class="fs-btn" href="./" style="text-decoration:none">ScoreHUB</a>' +
+        '<button class="fs-btn" id="out">Sign out</button></div>' +
+        (flash ? '<div class="fs-banner" style="border-color:#10b98166;background:#10b9811a;color:#6ee7b7">' + esc(flash) + '</div>' : '') +
+        (errMsg ? '<div class="fs-banner">' + esc(errMsg) + '</div>' : '') +
+        addForm + body;
+      flash = '';
+      document.getElementById('out').onclick = signOut;
+      var f = document.getElementById('addf');
+      if (f) f.addEventListener('submit', addCounter);
+    }
+
+    async function showList() {
+      try { await loadBouts(); renderList(); }
+      catch (e) { renderList(friendly(e)); }
+      stopList();
+      listTimer = setInterval(async function () {
+        if (FS && FS.isOpen()) return;
+        if (document.querySelector('.ss-modal-bg')) return;
+        var active = document.activeElement;
+        if (active && /INPUT/.test(active.tagName)) return;   // don't redraw while someone types
+        try { await loadBouts(); renderList(); } catch (e) { /* keep the last list */ }
+      }, 5000);
+    }
+
+    async function addCounter(ev) {
+      ev.preventDefault();
+      var name = document.getElementById('an').value.trim();
+      var email = document.getElementById('ae').value.trim().toLowerCase();
+      var phone = document.getElementById('ap').value.trim() || null;
+      var out = document.getElementById('adderr');
+      if (name.length < 2 || email.indexOf('@') < 1) { out.textContent = 'Enter a name and an email.'; return; }
+      var existing = await sb.rpc('list_officials');
+      var clash = (existing.data || []).find(function (o) { return norm(o.name) === norm(name) && o.role !== 'STATS'; });
+      if (clash) { out.textContent = name + ' is already registered as ' + (ROLE[clash.role] || clash.role) + '. Use a different name or change their role in the WDS dashboard.'; return; }
+      var r = await sb.from('official_invites').upsert({ email: email, name: name, role: 'STATS', phone: phone });
+      if (r.error) { out.textContent = friendly(r.error); return; }
+      flash = name + ' added as a Stat Counter.';
+      await showList();
+    }
+
+    // ---------------------------------------------------------------- assign counters
+    async function openCounters(boutId) {
+      var b = bouts.find(function (x) { return x.id === boutId; });
+      if (!b) return;
+      var r = await sb.rpc('list_stat_counters');
+      if (r.error) { alert(friendly(r.error)); return; }
+      var people = r.data || [];
+      var chosen = {};
+      (b.counters || []).forEach(function (c) { chosen[c.email] = true; });
+      // someone assigned earlier who is no longer a Stat Counter still shows, so they can be removed
+      (b.counters || []).forEach(function (c) {
+        if (!people.some(function (p) { return p.email === c.email; })) people.push({ email: c.email, name: c.name, registered: c.registered });
+      });
+      var bg = document.createElement('div');
+      bg.className = 'ss-modal-bg';
+      bg.innerHTML = '<div class="ss-modal" role="dialog" aria-label="Stat counters">' +
+        '<h2>Stat counters · Bout ' + esc(b.bout_number) + '</h2>' +
+        '<p>' + esc(b.blue_name || 'Blue') + ' vs ' + esc(b.red_name || 'Red') + '. Everyone ticked here can record strikes on this bout; they share one tally, so split the work (for example one counter per corner).</p>' +
+        (people.length ? people.map(function (p) {
+          return '<label class="ss-check"><input type="checkbox" value="' + esc(p.email) + '"' + (chosen[p.email] ? ' checked' : '') + '>' +
+            '<span><strong>' + esc(p.name) + '</strong><small>' + esc(p.email) + (p.registered ? '' : ' · invited, not signed in yet') + '</small></span></label>';
+        }).join('') : '<div class="ss-empty" style="padding:1.5rem">No stat counters yet. Add one first.</div>') +
+        '<div class="ss-err" id="cerr"></div>' +
+        '<div class="ss-row"><button class="fs-btn" data-x>Cancel</button><button class="fs-btn" data-save style="background-image:linear-gradient(90deg,#0b3fd4,#1580f5 55%,#29b6ff);border-color:transparent;color:#fff">Save</button></div></div>';
+      document.body.appendChild(bg);
+      bg.addEventListener('click', async function (ev) {
+        if (ev.target === bg || ev.target.hasAttribute('data-x')) { bg.remove(); return; }
+        if (!ev.target.hasAttribute('data-save')) return;
+        ev.target.disabled = true;
+        var want = {};
+        bg.querySelectorAll('input[type=checkbox]').forEach(function (i) { if (i.checked) want[i.value] = true; });
+        var add = Object.keys(want).filter(function (e) { return !chosen[e]; });
+        var del = Object.keys(chosen).filter(function (e) { return !want[e]; });
+        try {
+          if (add.length) {
+            var a = await sb.from('bout_stat_counters').insert(add.map(function (e) { return { bout_id: boutId, email: e }; }));
+            if (a.error) throw a.error;
+          }
+          if (del.length) {
+            var d = await sb.from('bout_stat_counters').delete().eq('bout_id', boutId).in('email', del);
+            if (d.error) throw d.error;
+          }
+          bg.remove();
+          flash = 'Counters saved for bout ' + b.bout_number + '.';
+          await showList();
+        } catch (e) {
+          document.getElementById('cerr').textContent = friendly(e);
+          ev.target.disabled = false;
+        }
+      });
+    }
+
+    // ---------------------------------------------------------------- routing
+    app.addEventListener('click', function (ev) {
+      var el = ev.target.closest('button');
+      if (!el) return;
+      if (el.hasAttribute('data-open')) location.hash = '#/bout/' + encodeURIComponent(el.getAttribute('data-open'));
+      if (el.hasAttribute('data-counters')) openCounters(el.getAttribute('data-counters'));
+    });
+
+    async function route() {
+      if (!me) { renderSignIn(); return; }
+      var m = (location.hash || '').match(/^#\/bout\/([^/?#]+)/);
+      if (m) {
+        stopList();
+        var id = decodeURIComponent(m[1]);
+        if (!FS) { app.textContent = 'fight-stats.js did not load.'; return; }
+        if (FS.isOpen()) FS.close();
+        app.innerHTML = '';
+        FS.open(id, {
+          closeLabel: 'Back to bouts',
+          onClose: function () { if (/^#\/bout\//.test(location.hash)) location.hash = '#/'; },
+        });
+        return;
+      }
+      if (FS && FS.isOpen()) FS.close();
+      showList();
+    }
+
+    window.addEventListener('hashchange', route);
+
+    (async function start() {
+      if (!sb) { app.innerHTML = '<div class="ss-empty">Could not load the database client (vendor/supabase.js).</div>'; return; }
+      app.innerHTML = '<div class="ss-empty">Loading…</div>';
+      try { me = await loadMe(); } catch (e) { me = null; }
+      route();
+    })();
+  })();
+  </script>
+</body>
+</html>

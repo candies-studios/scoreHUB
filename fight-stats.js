@@ -120,7 +120,7 @@
   function errMsg(e) {
     if (!e) return 'Something went wrong';
     var m = e.message || String(e);
-    if (e.code === '42501') return 'You are not an official on this bout.';
+    if (e.code === '42501') return 'You are not a stat counter on this bout.';
     if (/bout_stats|function .* does not exist|Could not find the function/i.test(m) && /exist|find/i.test(m)) {
       return 'Fight stats are not set up in the database yet (run config/migrations/002_fight_stats.sql).';
     }
@@ -165,6 +165,15 @@
       },
       adjust: async function (id, round, corner, seconds) {
         must(await sb.rpc('bout_stats_adjust_control', { p_bout: id, p_round: round, p_corner: corner, p_seconds: seconds }));
+      },
+      loadWeights: async function () {
+        var res = await sb.from('stat_score_weights').select('key,weight');
+        if (res.error || !res.data || !res.data.length) return null;
+        var map = { sig_landed: 'sigLanded', head_bonus: 'headBonus', body_bonus: 'bodyBonus', leg_bonus: 'legBonus',
+          other_landed: 'otherLanded', kd: 'kd', td_landed: 'tdLanded', sub_att: 'subAtt', rev: 'rev', ctrl_per_minute: 'ctrlPerMinute' };
+        var w = {};
+        res.data.forEach(function (r) { if (map[r.key]) w[map[r.key]] = Number(r.weight); });
+        return w;
       },
       subscribe: function (id, onChange) {
         var ch = sb.channel('fight-stats-' + id + '-' + Math.random().toString(36).slice(2, 8))
@@ -232,6 +241,7 @@
   }
 
   var store = null;
+  var weightsLoaded = false;
   function getStore() {
     if (store) return store;
     if (window.__WDS_SUPABASE__) store = supabaseStore(window.__WDS_SUPABASE__);
@@ -298,7 +308,7 @@
     '.fs-chip.on{background:#e2e8f0;color:#04060d;border-color:#e2e8f0}',
     '.fs-pad{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}',
     '.fs-pad.three{grid-template-columns:repeat(3,1fr)}',
-    '.fs-key{position:relative;min-height:64px;border-radius:.875rem;border:1px solid #1a2640;background:#070b16;color:#e2e8f0;font:700 .875rem/1.1 inherit;cursor:pointer;user-select:none;touch-action:manipulation;transition:transform .06s,border-color .15s;padding:.5rem}',
+    '.fs-key{position:relative;min-height:64px;border-radius:.875rem;border:1px solid #1a2640;background:#070b16;color:#e2e8f0;font:700 .875rem/1.1 inherit;cursor:pointer;user-select:none;touch-action:manipulation;transition:transform .06s,border-color .15s;padding:.5rem 1.375rem}',
     '.fs-key:active{transform:scale(.96)}',
     '.fs-key small{display:block;font-weight:500;font-size:.6875rem;color:#94a3b8;margin-top:.25rem}',
     '.fs-key .ct{position:absolute;top:.375rem;right:.5rem;font-size:.6875rem;font-weight:700;color:#94a3b8;font-variant-numeric:tabular-nums}',
@@ -547,7 +557,7 @@
     for (var i = 1; i <= b.total_rounds; i++) tabs.push(i);
     var banner = '';
     if (S.setupError) banner = '<div class="fs-banner">' + esc(S.setupError) + '</div>';
-    else if (!S.canRecord && b.status === 'LIVE') banner = '<div class="fs-banner">View only — fight stats are recorded by the bout’s referee, its seated judges, or management.</div>';
+    else if (!S.canRecord && b.status === 'LIVE') banner = '<div class="fs-banner">View only — strikes are counted by the stat counters assigned to this bout (management assigns them on the Strike Sheet page).</div>';
     else if (b.status === 'SCHEDULED') banner = '<div class="fs-banner">This bout has not started. Stats recording opens when the first round starts.</div>';
     else if (b.status === 'COMPLETED' && !S.canRecord) banner = '';
     else if (b.status === 'COMPLETED' && S.canRecord) banner = '<div class="fs-banner">This bout is finished. As management you can still correct the stats until the result is finalized.</div>';
@@ -580,10 +590,10 @@
     var status = !b ? '' : b.status === 'COMPLETED' ? 'Finished' : b.round_started_at ? 'Round ' + b.current_round + ' live' : b.status === 'LIVE' ? 'Between rounds · R' + Math.max(1, b.current_round) : 'Not started';
     var sub = b ? [b.bout_number ? 'Bout ' + b.bout_number : '', b.bout_name || '', esc(b.blueName) + ' vs ' + esc(b.redName)].filter(Boolean).join(' · ') : '';
     return '<div class="fs-top"><div class="fs-top-in">' +
-      '<div class="fs-title"><h1>Fight Stats Sheet</h1><p>' + sub + '</p></div>' +
+      '<div class="fs-title"><h1>Strike Sheet</h1><p>' + sub + '</p></div>' +
       (b ? '<span class="fs-pill"><span class="fs-dot' + (b.round_started_at ? ' live' : '') + '"></span>' + status + '</span>' : '') +
       (S.canRecord && b ? '<button type="button" class="fs-btn" data-undo' + (S.busyUndo ? ' disabled' : '') + '>Undo last</button>' : '') +
-      '<button type="button" class="fs-btn" data-close>Close</button></div></div>';
+      '<button type="button" class="fs-btn" data-close>' + esc(S.closeLabel || 'Close') + '</button></div></div>';
   }
 
   // Updates only the ticking numbers (control clocks, duration) between renders.
@@ -733,17 +743,20 @@
 
   function onKey(ev) { if (ev.key === 'Escape' && S) close(); }
 
-  async function open(boutId) {
+  // opts.onClose: called after the sheet closes; opts.closeLabel: text of the close button.
+  async function open(boutId, opts) {
+    opts = opts || {};
     injectCss();
     if (!getStore()) { toast('Fight stats need the WDS database connection (supabase-bridge.js).'); return; }
     if (S) close();
     var root = document.createElement('div');
     root.className = 'fs-overlay';
     root.setAttribute('role', 'dialog');
-    root.setAttribute('aria-label', 'Fight Stats Sheet');
+    root.setAttribute('aria-label', 'Strike Sheet');
     document.body.appendChild(root);
     document.documentElement.style.overflow = 'hidden';
     S = {
+      onClose: opts.onClose, closeLabel: opts.closeLabel, fromFab: !!opts.fromFab,
       boutId: boutId, root: root, bout: null, rows: {}, pending: 0, canRecord: false, staff: false,
       entryRound: 1, entryPinned: false, viewRound: 'ALL', error: null, setupError: null,
       sel: { BLUE: { target: 'HEAD', position: 'DISTANCE' }, RED: { target: 'HEAD', position: 'DISTANCE' } },
@@ -751,6 +764,10 @@
     root.addEventListener('click', onClick);
     document.addEventListener('keydown', onKey);
     render();
+    if (store.loadWeights && !weightsLoaded) {
+      try { var dbw = await store.loadWeights(); if (dbw) { Object.assign(W, dbw, user.weights || {}); weightsLoaded = true; } }
+      catch (e) { /* keep the defaults */ }
+    }
     try {
       applyBout(await store.loadBout(boutId));
     } catch (e) {
@@ -778,7 +795,9 @@
     S.root.remove();
     document.removeEventListener('keydown', onKey);
     document.documentElement.style.overflow = '';
+    var cb = S.onClose;
     S = null;
+    if (cb) cb();
   }
 
   // ---------------------------------------------------------------------------
@@ -798,23 +817,48 @@
     var id = currentBoutId();
     if (!id) {
       if (fab) { fab.remove(); fab = null; document.body.style.paddingBottom = ''; }
-      if (S) close();
+      if (S && S.fromFab) close();   // leaving the Memory Sheet closes a sheet opened from its button
       return;
     }
-    if (S && S.boutId !== id) close();
+    if (S && S.fromFab && S.boutId !== id) close();
     if (!fab) {
       injectCss();
       fab = document.createElement('button');
       fab.type = 'button';
       fab.className = 'fs-fab';
-      fab.innerHTML = ICON + '<span>Fight Stats</span>';
-      fab.addEventListener('click', function () { var b = currentBoutId(); if (b) open(b); });
+      fab.innerHTML = ICON + '<span>Strike Sheet</span>';
+      fab.addEventListener('click', function () { var b = currentBoutId(); if (b) open(b, { fromFab: true }); });
     }
     if (!fab.isConnected) {
       document.body.appendChild(fab);
       document.body.style.paddingBottom = '5rem';   // keep the page's own bottom buttons reachable
     }
     fab.setAttribute('data-bout', id);
+  }
+
+  // "Strike Sheet" link under every "Memory Sheet" link in the bout list.
+  var LINK_PAGE = user.page || 'strike-sheet.html';
+  function addLinks() {
+    var links = document.querySelectorAll('a[href*="/bouts/"]');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      var m = (a.getAttribute('href') || '').match(/\/bouts\/([^/?#]+)\/score$/);
+      if (!m || a.getAttribute('data-fs-done')) continue;
+      a.setAttribute('data-fs-done', '1');
+      var l = document.createElement('a');
+      l.href = LINK_PAGE + '#/bout/' + encodeURIComponent(decodeURIComponent(m[1]));
+      l.className = a.className;
+      l.textContent = 'Strike Sheet';
+      l.setAttribute('data-fs-link', '1');
+      a.parentNode.insertBefore(l, a.nextSibling);
+    }
+  }
+  var linkTimer = null;
+  if (window.MutationObserver) {
+    new MutationObserver(function () {
+      clearTimeout(linkTimer);
+      linkTimer = setTimeout(addLinks, 50);
+    }).observe(document.documentElement, { childList: true, subtree: true });
   }
 
   ['pushState', 'replaceState'].forEach(function (m) {
@@ -828,7 +872,8 @@
 
   // Small API for support / other scripts: ScoreHUBFightStats.open('<bout id>')
   window.ScoreHUBFightStats = {
-    open: open, close: close, performance: performance, roundCard: roundCard,
+    open: open, close: close, performance: performance, roundCard: roundCard, isOpen: function () { return !!S; },
+    injectCss: injectCss,
     weights: W, rules: R,
   };
 })();

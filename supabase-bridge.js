@@ -367,7 +367,7 @@
   // Officials & sign-in
   // ---------------------------------------------------------------------------
   function norm(s) { return String(s || '').trim().replace(/\s+/g, ' ').toLowerCase(); }
-  var ROLE_LABEL = { ADMIN: 'Admin', PROMOTER: 'Promoter', JUDGE: 'Judge', REFEREE: 'Referee' };
+  var ROLE_LABEL = { ADMIN: 'Admin', PROMOTER: 'Promoter', JUDGE: 'Judge', REFEREE: 'Referee', STATS: 'Stat Counter' };
 
   async function myProfile() {
     var uid = await currentUserId();
@@ -393,6 +393,9 @@
     var person = officials.find(function (o) { return norm(o.name) === norm(name) && o.role === role; });
     if (!person) {
       var other = officials.find(function (o) { return norm(o.name) === norm(name); });
+      if (other && other.role === 'STATS') {
+        throw HttpError(name + ' is a Stat Counter — sign in on the Strike Sheet page: ' + location.origin + location.pathname.replace(/[^/]*$/, '') + 'strike-sheet.html', 422);
+      }
       throw HttpError(other
         ? name + ' is registered as ' + (ROLE_LABEL[other.role] || other.role) + ' — choose that role.'
         : 'No ' + (ROLE_LABEL[role] || role) + ' named "' + name + '" is registered with WDS. Ask management to add you.', 422);
