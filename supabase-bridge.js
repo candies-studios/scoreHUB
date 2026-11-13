@@ -245,7 +245,7 @@
   }
 
   var BOUT_SELECT = '*, event:events(id,title,starts_at,venue,city,promoter_name,logo_url,status),' +
-    'judges:bout_judges(id,bout_id,judge_id,seat,judge:profiles(id,name)),' +
+    'judges:bout_judges(id,bout_id,judge_id,seat,display_name,judge:profiles(id,name)),' +
     'scores:round_scores(id,bout_id,judge_id,round_number,tally,blue_score,red_score,submitted,submitted_at),' +
     'referee:profiles!bouts_referee_id_fkey(id,name)';
 
@@ -283,7 +283,7 @@
       out.referee = b.referee ? { id: b.referee.id, name: b.referee.name } : null;
       out.judges = (b.judges || []).slice().sort(function (x, y) { return x.seat - y.seat; }).map(function (j) {
         return { id: j.id, boutId: j.bout_id, judgeId: j.judge_id, seat: j.seat,
-          judge: { id: j.judge_id, name: j.judge ? j.judge.name : 'Judge' } };
+          judge: { id: j.judge_id, name: j.display_name || (j.judge ? j.judge.name : 'Judge') } };
       });
       out.roundScores = (b.scores || []).map(function (s) {
         return { id: s.id, boutId: s.bout_id, judgeId: s.judge_id, roundNumber: s.round_number,
@@ -390,7 +390,9 @@
     if (!pin || pin.length < PIN_MIN) throw HttpError('Enter your PIN (at least ' + PIN_MIN + ' characters).', 422);
 
     var officials = must(await sb.rpc('list_officials'));
-    var person = officials.find(function (o) { return norm(o.name) === norm(name) && o.role === role; });
+    // The login page has no Promoter tile any more: promoters sign in with "Admin".
+    var sameRole = function (r) { return r === role || (role === 'ADMIN' && r === 'PROMOTER'); };
+    var person = officials.find(function (o) { return norm(o.name) === norm(name) && sameRole(o.role); });
     if (!person) {
       var other = officials.find(function (o) { return norm(o.name) === norm(name); });
       if (other && other.role === 'STATS') {
@@ -414,7 +416,7 @@
       }
     }
     var me = await myProfile();
-    if (!me || me.role !== role) {
+    if (!me || !sameRole(me.role)) {
       await sb.auth.signOut({ scope: 'local' });
       throw HttpError('Your account is not active yet. Ask WDS management to check your role.', 403);
     }
@@ -617,14 +619,16 @@
     await requireUser();
     var cols = Object.assign(boutColumns(body), { event_id: p[0] });
     var b = must(await sb.from('bouts').insert(cols).select('id').single());
-    await replaceSeats(b.id, body.judgeIds);
+    // Judges take their own seats on the Memory Sheet; referees are not assigned.
     return getBout(b.id);
   });
   on('PUT', '/api/bouts/:id', async function (p, body) {
     await requireUser();
-    var upd = must(await sb.from('bouts').update(boutColumns(body)).eq('id', p[0]).select('id'));
+    var cols = boutColumns(body);
+    delete cols.referee_id;   // set by the referee who starts the bout, never by the edit form
+    var upd = must(await sb.from('bouts').update(cols).eq('id', p[0]).select('id'));
     if (!upd.length) throw HttpError('Only management can edit bouts', 403);
-    await replaceSeats(p[0], body.judgeIds);
+    // Seats are taken by the judges themselves (bout_claim_seat), so they are left alone here.
     return getBout(p[0]);
   });
   on('DELETE', '/api/bouts/:id', async function (p) {
@@ -710,8 +714,9 @@
   // A judge who has not pressed "Start round N" yet keeps their button; they get
   // the running clock (same start time as everyone) when they press it.
   BoutRoom.prototype.started = function (round, at) {
-    if (this.args.role !== 'VIEWER' && round > this.localRound) { this.pendingStart = { round: round, at: at }; return; }
+    // Judges no longer press "Start round": every tablet gets the clock as soon as the referee starts it.
     this.pendingStart = null;
+    if (round > this.localRound) this.localRound = round;
     this.emit('bout:started', { round: round, roundStartedAt: at });
   };
 
@@ -778,6 +783,23 @@
       }
     }
     if (submitted.join(',') !== prevSubmitted) this.emit('round:progress', { submitted: submitted });
+    // Round time is up: a referee's (or management's) tablet stops the clock, so judges can submit.
+    var ctl = this.args.role === 'REFEREE' || this.args.role === 'ADMIN' || this.args.role === 'PROMOTER';
+    if (ctl && b.round_started_at && b.status === 'LIVE' && !this.autoStopping &&
+        (Date.now() - Date.parse(b.round_started_at)) / 1000 >= (b.round_duration || 300)) {
+      var room = this;
+      this.autoStopping = true;
+      sb.rpc('bout_set_clock', { p_bout: id, p_running: false }).then(function () {
+        room.autoStopping = false;
+        room.resync();
+      }, function () { room.autoStopping = false; });
+    } else if (ctl && b.round_started_at && b.status === 'LIVE') {
+      // check again right when the time runs out
+      var left = (b.round_duration || 300) * 1000 - (Date.now() - Date.parse(b.round_started_at));
+      var self2 = this;
+      clearTimeout(this.expiryTimer);
+      this.expiryTimer = setTimeout(function () { self2.resync(); }, Math.max(250, left + 300));
+    }
     if (b.status === 'COMPLETED' && (!prev || prev.status !== 'COMPLETED')) {
       var corner = b.winner_id && b.winner_id === b.blue_fighter_id ? 'BLUE' : b.winner_id && b.winner_id === b.red_fighter_id ? 'RED' : null;
       this.emit('bout:finished', { resultType: b.result_type, winnerCorner: corner, summary: b.result_note || undefined });
@@ -858,6 +880,7 @@
   BoutRoom.prototype.close = function () {
     this.closed = true;
     if (this.poll) clearInterval(this.poll);
+    clearTimeout(this.expiryTimer);
     if (this.args) leaveHub(this.args.boutId, this);
   };
 
