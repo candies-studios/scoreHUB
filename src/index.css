@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Full-height shell so the spotlight gradient covers short pages. */
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html,
+body {
+  @apply bg-ink-900 text-slate-200 antialiased;
+}
+
+/* The soft blue glow behind the logo in the brand artwork, reused as page light. */
+.ss-spotlight {
+  @apply bg-spotlight;
+}
+
+@layer components {
+  /* Pill inputs — the rounded outline look the paper sheet was rebuilt from. */
+  .ss-input {
+    @apply w-full rounded-full border border-ink-500 bg-ink-700 px-4 py-2.5 text-sm
+           text-slate-100 outline-none transition
+           placeholder:text-slate-500
+           focus:border-brand-400 focus:ring-2 focus:ring-brand-400/25
+           disabled:cursor-not-allowed disabled:bg-ink-800 disabled:text-slate-500;
+  }
+
+  /* Native selects need their own arrow colour on a dark field. */
+  select.ss-input option {
+    @apply bg-ink-700 text-slate-100;
+  }
+
+  .ss-label {
+    @apply mb-1 block px-4 text-xs font-medium text-slate-400;
+  }
+
+  .ss-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-2.5
+           text-sm font-semibold transition focus:outline-none focus:ring-2
+           focus:ring-brand-400/40 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .ss-btn-primary {
+    @apply ss-btn bg-brand-grad text-white shadow-glow
+           hover:brightness-110 hover:shadow-glow-lg;
+  }
+
+  .ss-btn-ghost {
+    @apply ss-btn border border-ink-500 bg-ink-700 text-slate-200
+           hover:border-brand-400/60 hover:text-white;
+  }
+
+  .ss-btn-danger {
+    @apply ss-btn bg-redCorner-solid text-white hover:brightness-110;
+  }
+
+  .ss-btn-success {
+    @apply ss-btn bg-emerald-500 text-ink-900 hover:bg-emerald-400;
+  }
+
+  /* Table header cell — the gradient bars in the fighter / league lists. */
+  .ss-th {
+    @apply rounded-full bg-brand-grad px-4 py-3 text-center text-sm
+           font-semibold text-white;
+  }
+
+  .ss-td {
+    @apply rounded-full border border-ink-500 bg-ink-700 px-4 py-3
+           text-center text-sm font-medium text-slate-200;
+  }
+
+  .ss-card {
+    @apply rounded-2xl border border-ink-500 bg-ink-800 p-6 shadow-card;
+  }
+
+  .ss-tile {
+    @apply flex aspect-square w-full flex-col items-center justify-center gap-4
+           rounded-2xl border border-ink-500 bg-ink-800 text-slate-300 transition
+           hover:-translate-y-0.5 hover:border-brand-400/70 hover:text-white
+           hover:shadow-glow;
+  }
+
+  /* Dialog shell, shared by the finish confirmation and the waiting gate. */
+  .ss-modal {
+    @apply w-full rounded-2xl border border-ink-500 bg-ink-800 p-8 shadow-glow-lg;
+  }
+}
+
+/* The judge sheet is a dense grid; keep taps from selecting text. */
+.tally-cell {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Date/time pickers ship a black glyph that vanishes on a dark field. */
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.6);
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(41, 182, 255, 0.3);
+}
