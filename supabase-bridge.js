@@ -730,7 +730,8 @@
       : b.round_started_at ? 'LIVE'
       : (b.status === 'LIVE' && (b.current_round || 0) > 0) ? 'BETWEEN_ROUNDS' : 'WAITING';
     return {
-      boutId: this.args.boutId, joined: joined, expected: expected, ready: joined >= expected,
+      // ready is always true: the Memory Sheet opens at once and does not wait for every judge to join
+      boutId: this.args.boutId, joined: joined, expected: expected, ready: true,
       participants: participants, status: status, currentRound: b.current_round || 1,
       roundStartedAt: b.round_started_at ? Date.parse(b.round_started_at) : null,
       roundDuration: b.round_duration || this.args.roundDuration, submitted: this.submitted.slice(),
