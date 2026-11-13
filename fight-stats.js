@@ -120,7 +120,7 @@
   function errMsg(e) {
     if (!e) return 'Something went wrong';
     var m = e.message || String(e);
-    if (e.code === '42501') return 'You are not a stat counter on this bout.';
+    if (e.code === '42501') return /link/i.test(m) ? m : 'You are not a stat counter on this bout.';
     if (/bout_stats|function .* does not exist|Could not find the function/i.test(m) && /exist|find/i.test(m)) {
       return 'Fight stats are not set up in the database yet (run config/migrations/002_fight_stats.sql).';
     }
@@ -132,7 +132,7 @@
     return {
       live: true,
       loadBout: async function (id) {
-        var b = must(await sb.from('bouts').select('id,bout_number,bout_name,discipline,status,current_round,' +
+        var b = must(await sb.from('bouts').select('id,event_id,bout_number,bout_name,discipline,status,current_round,' +
           'total_rounds,round_duration,round_started_at,started_at,completed_at,end_round,end_time_sec,' +
           'result_type,result_status,blue_fighter_id,red_fighter_id').eq('id', id).maybeSingle());
         if (!b) throw new Error('Bout not found');
@@ -145,6 +145,8 @@
             names[f.id] = full;
           });
         }
+        var ev = await sb.from('events').select('title').eq('id', b.event_id).maybeSingle();
+        b.event_title = ev.data ? ev.data.title : '';
         b.blueName = names[b.blue_fighter_id] || 'Blue corner';
         b.redName = names[b.red_fighter_id] || 'Red corner';
         return b;
@@ -166,6 +168,10 @@
       adjust: async function (id, round, corner, seconds) {
         must(await sb.rpc('bout_stats_adjust_control', { p_bout: id, p_round: round, p_corner: corner, p_seconds: seconds }));
       },
+      isStaff: async function () {
+        var res = await sb.rpc('is_staff');
+        return !res.error && res.data === true;
+      },
       loadWeights: async function () {
         var res = await sb.from('stat_score_weights').select('key,weight');
         if (res.error || !res.data || !res.data.length) return null;
@@ -182,6 +188,56 @@
           .subscribe();
         return function () { try { sb.removeChannel(ch); } catch (e) { /* ignore */ } };
       },
+    };
+  }
+
+  // A random id for this browser, so "Undo last" works for link users (no account).
+  function deviceId() {
+    var k = 'wds-strike-device';
+    try {
+      var v = localStorage.getItem(k);
+      if (!v) { v = 'd' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem(k, v); }
+      return v;
+    } catch (e) { return 'd-' + Math.random().toString(36).slice(2); }
+  }
+
+  // Share-link mode: the SAME sheet and the SAME database functions as signed-in
+  // counters, with the link's token in place of an account.
+  function linkStore(sb, token) {
+    var base = supabaseStore(sb);
+    var device = deviceId();
+    var pending = null;
+    function must(res) { if (res.error) throw res.error; return res.data; }
+    function state(id) {
+      if (pending && pending.id === id && Date.now() - pending.at < 400) return pending.p;
+      var p = sb.rpc('strike_link_state', { p_token: token, p_bout: id }).then(must);
+      pending = { id: id, at: Date.now(), p: p };
+      p.catch(function () { pending = null; });
+      return p;
+    }
+    function fresh() { pending = null; }
+    return {
+      live: true, link: true, token: token,
+      loadBout: async function (id) { return (await state(id)).bout; },
+      loadStats: async function (id) { return (await state(id)).stats || []; },
+      canRecord: async function (id) { fresh(); return !!(await state(id)).can_record; },
+      record: async function (id, round, corner, action, target, position) {
+        fresh();
+        must(await sb.rpc('bout_stats_record', { p_bout: id, p_round: round, p_corner: corner, p_action: action,
+          p_target: target || null, p_position: position || null, p_token: token, p_device: device }));
+      },
+      undo: async function (id) { fresh(); return must(await sb.rpc('bout_stats_undo', { p_bout: id, p_token: token, p_device: device })); },
+      control: async function (id, round, corner, running) {
+        fresh();
+        must(await sb.rpc('bout_stats_control', { p_bout: id, p_round: round, p_corner: corner, p_running: running, p_token: token, p_device: device }));
+      },
+      adjust: async function (id, round, corner, seconds) {
+        fresh();
+        must(await sb.rpc('bout_stats_adjust_control', { p_bout: id, p_round: round, p_corner: corner, p_seconds: seconds, p_token: token, p_device: device }));
+      },
+      loadWeights: base.loadWeights,
+      isStaff: async function () { return false; },
+      subscribe: function () { return function () {}; },   // no account = no Realtime; the sheet polls instead
     };
   }
 
@@ -240,13 +296,14 @@
     };
   }
 
-  var store = null;
+  var store = null;          // the store of the open sheet
+  var defaultStore = null;   // signed-in (or demo) store
   var weightsLoaded = false;
   function getStore() {
-    if (store) return store;
-    if (window.__WDS_SUPABASE__) store = supabaseStore(window.__WDS_SUPABASE__);
-    else if (!cfg.supabaseUrl) store = memoryStore();
-    return store;
+    if (defaultStore) return defaultStore;
+    if (window.__WDS_SUPABASE__) defaultStore = supabaseStore(window.__WDS_SUPABASE__);
+    else if (!cfg.supabaseUrl) defaultStore = memoryStore();
+    return defaultStore;
   }
 
   // ---------------------------------------------------------------------------
@@ -291,7 +348,7 @@
     '.fs-tab .now{margin-left:.25rem;color:#6ee7b7}',
     '.fs-grid{display:grid;gap:1rem}',
     '@media(min-width:720px){.fs-grid{grid-template-columns:1fr 1fr}}',
-    '.fs-corner{border-radius:1rem;border:1px solid;padding:1rem}',
+    '.fs-corner{border-radius:1rem;border:1px solid;padding:1rem;min-width:0}',
     '.fs-corner.BLUE{background:#0d1b3d66;border-color:#2a4d9e}',
     '.fs-corner.RED{background:#2b0d1866;border-color:#8e2942}',
     '.fs-corner-h{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.75rem}',
@@ -304,19 +361,20 @@
     '.fs-sec{margin-top:.75rem}',
     '.fs-sec h3{font-size:.6875rem;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;font-weight:700;margin:0 0 .5rem}',
     '.fs-chips{display:flex;gap:.375rem;margin-bottom:.5rem;flex-wrap:wrap}',
-    '.fs-chip{flex:1;min-width:4.5rem;border-radius:9999px;border:1px solid #1a2640;background:#0b1120;color:#cbd5e1;padding:.5rem .5rem;font:600 .75rem/1rem inherit;cursor:pointer;user-select:none}',
+    '.fs-chip{flex:1;min-width:0;border-radius:9999px;border:1px solid #1a2640;background:#0b1120;color:#cbd5e1;padding:.5rem .5rem;font:600 .75rem/1rem inherit;cursor:pointer;user-select:none}',
     '.fs-chip.on{background:#e2e8f0;color:#04060d;border-color:#e2e8f0}',
-    '.fs-pad{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}',
-    '.fs-pad.three{grid-template-columns:repeat(3,1fr)}',
-    '.fs-key{position:relative;min-height:64px;border-radius:.875rem;border:1px solid #1a2640;background:#070b16;color:#e2e8f0;font:700 .875rem/1.1 inherit;cursor:pointer;user-select:none;touch-action:manipulation;transition:transform .06s,border-color .15s;padding:.5rem 1.375rem}',
+    '.fs-pad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}',
+    '.fs-pad.three{grid-template-columns:repeat(3,minmax(0,1fr))}',
+    '.fs-key{position:relative;min-height:64px;border-radius:.875rem;border:1px solid #1a2640;background:#070b16;color:#e2e8f0;font:700 .875rem/1.1 inherit;cursor:pointer;user-select:none;touch-action:manipulation;transition:transform .06s,border-color .15s;padding:1.125rem .375rem .625rem;min-width:0}',
     '.fs-key:active{transform:scale(.96)}',
+    '@media(max-width:480px){.fs-key{font-size:.8125rem}.fs-key small{font-size:.625rem}}',
     '.fs-key small{display:block;font-weight:500;font-size:.6875rem;color:#94a3b8;margin-top:.25rem}',
     '.fs-key .ct{position:absolute;top:.375rem;right:.5rem;font-size:.6875rem;font-weight:700;color:#94a3b8;font-variant-numeric:tabular-nums}',
     '.BLUE .fs-key.hit{border-color:#2a4d9e;background:#0d1b3d}.RED .fs-key.hit{border-color:#8e2942;background:#2b0d18}',
     '.fs-key.kd{border-color:#f59e0b66;background:#f59e0b1a;color:#fde68a}',
     '.fs-key:disabled{opacity:.35;cursor:default;transform:none}',
     '.fs-ctrl{display:flex;align-items:center;gap:.5rem;margin-top:.5rem}',
-    '.fs-ctrl .go{flex:1;min-height:56px;border-radius:.875rem;border:1px solid #1a2640;background:#070b16;color:#e2e8f0;font:700 .875rem inherit;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 1rem}',
+    '.fs-ctrl .go{flex:1;min-width:0;min-height:56px;border-radius:.875rem;border:1px solid #1a2640;background:#070b16;color:#e2e8f0;font:700 .875rem inherit;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 1rem}',
     '.fs-ctrl .go.on{background:#10b981;color:#04060d;border-color:#10b981}',
     '.fs-ctrl .go b{font-size:1.25rem;font-variant-numeric:tabular-nums}',
     '.fs-ctrl .adj{width:3.25rem;min-height:56px;border-radius:.875rem;border:1px solid #1a2640;background:#0b1120;color:#cbd5e1;font:600 .75rem inherit;cursor:pointer}',
@@ -341,6 +399,16 @@
     '.fs-toast.ok{background:#0b1120;border:1px solid #1a2640;color:#e2e8f0}',
     '.fs-banner{border-radius:1rem;border:1px solid #f59e0b66;background:#f59e0b1a;color:#fde68a;padding:.75rem 1rem;font-size:.8125rem;margin-top:1rem}',
     '.fs-empty{padding:4rem 1rem;text-align:center;color:#94a3b8}',
+    '.fs-share-bg{position:fixed;inset:0;z-index:90;background:#04060dcc;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:1rem;font-family:var(--font-sans,Inter,system-ui,sans-serif)}',
+    '.fs-share{width:100%;max-width:34rem;border-radius:1rem;border:1px solid #1a2640;background:#070b16;padding:1.5rem;color:#e2e8f0;box-shadow:0 0 60px -10px rgba(41,182,255,.55)}',
+    '.fs-share h2{margin:0 0 .5rem;font-size:1.0625rem;color:#fff}',
+    '.fs-share p{margin:0 0 1rem;font-size:.8125rem;color:#94a3b8;line-height:1.5}',
+    '.fs-share p strong{color:#e2e8f0}',
+    '.fs-share label{display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin:.75rem 0 .375rem}',
+    '.fs-share-row{display:flex;gap:.5rem}',
+    '.fs-share-row input{flex:1;min-width:0;border-radius:9999px;border:1px solid #1a2640;background:#0b1120;color:#f1f5f9;padding:.5rem .875rem;font-size:.75rem}',
+    '.fs-share-acts{display:flex;gap:.5rem;align-items:center;margin-top:1.25rem;flex-wrap:wrap}',
+    '.fs-share-msg{color:#6ee7b7!important;margin-top:.75rem!important}',
   ].join('\n');
 
   function injectCss() {
@@ -557,6 +625,7 @@
     for (var i = 1; i <= b.total_rounds; i++) tabs.push(i);
     var banner = '';
     if (S.setupError) banner = '<div class="fs-banner">' + esc(S.setupError) + '</div>';
+    else if (!S.canRecord && b.status === 'LIVE' && S.link) banner = '<div class="fs-banner">This link can no longer record — it may have been turned off or replaced. Ask WDS management for the current link.</div>';
     else if (!S.canRecord && b.status === 'LIVE') banner = '<div class="fs-banner">View only — strikes are counted by the stat counters assigned to this bout (management assigns them on the Strike Sheet page).</div>';
     else if (b.status === 'SCHEDULED') banner = '<div class="fs-banner">This bout has not started. Stats recording opens when the first round starts.</div>';
     else if (b.status === 'COMPLETED' && !S.canRecord) banner = '';
@@ -592,6 +661,7 @@
     return '<div class="fs-top"><div class="fs-top-in">' +
       '<div class="fs-title"><h1>Strike Sheet</h1><p>' + sub + '</p></div>' +
       (b ? '<span class="fs-pill"><span class="fs-dot' + (b.round_started_at ? ' live' : '') + '"></span>' + status + '</span>' : '') +
+      (S.isStaff && b && b.event_id ? '<button type="button" class="fs-btn" data-share>Share link</button>' : '') +
       (S.canRecord && b ? '<button type="button" class="fs-btn" data-undo' + (S.busyUndo ? ' disabled' : '') + '>Undo last</button>' : '') +
       '<button type="button" class="fs-btn" data-close>' + esc(S.closeLabel || 'Close') + '</button></div></div>';
   }
@@ -694,6 +764,7 @@
     if (!el || !S || el.disabled) return;
     var corner = el.getAttribute('data-corner');
     if (el.hasAttribute('data-close')) return close();
+    if (el.hasAttribute('data-share')) return shareDialog(S.bout.event_id, S.bout.event_title || '', S.boutId);
     if (el.hasAttribute('data-undo')) {
       S.busyUndo = true; render();
       return call(async function () {
@@ -747,7 +818,8 @@
   async function open(boutId, opts) {
     opts = opts || {};
     injectCss();
-    if (!getStore()) { toast('Fight stats need the WDS database connection (supabase-bridge.js).'); return; }
+    store = opts.store || getStore();
+    if (!store) { toast('The Strike Sheet needs the WDS database connection (supabase-bridge.js).'); return; }
     if (S) close();
     var root = document.createElement('div');
     root.className = 'fs-overlay';
@@ -756,7 +828,7 @@
     document.body.appendChild(root);
     document.documentElement.style.overflow = 'hidden';
     S = {
-      onClose: opts.onClose, closeLabel: opts.closeLabel, fromFab: !!opts.fromFab,
+      onClose: opts.onClose, closeLabel: opts.closeLabel, fromFab: !!opts.fromFab, link: !!store.link, isStaff: false,
       boutId: boutId, root: root, bout: null, rows: {}, pending: 0, canRecord: false, staff: false,
       entryRound: 1, entryPinned: false, viewRound: 'ALL', error: null, setupError: null,
       sel: { BLUE: { target: 'HEAD', position: 'DISTANCE' }, RED: { target: 'HEAD', position: 'DISTANCE' } },
@@ -783,7 +855,8 @@
       clearTimeout(queued);
       queued = setTimeout(function () { if (S && S.boutId === id) refresh(what === 'bout'); }, 120);
     });
-    S.poll = setInterval(function () { if (S && S.pending === 0) refresh(true); }, POLL_MS);
+    S.poll = setInterval(function () { if (S && S.pending === 0) refresh(true); }, opts.pollMs || (store.link ? 1500 : POLL_MS));
+    if (store.isStaff) store.isStaff().then(function (ok) { if (S && S.boutId === id) { S.isStaff = ok; render(); } }).catch(function () {});
     S.ticker = setInterval(tick, 250);
   }
 
@@ -870,10 +943,72 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncButton);
   else syncButton();
 
+  // ---------------------------------------------------------------------------
+  // Share link (management): one link per event, no sign-in for whoever has it.
+  // ---------------------------------------------------------------------------
+  function sheetPageUrl() {
+    var dir = location.origin + location.pathname.replace(/[^/]*$/, '');
+    return dir + (user.page || 'strike-sheet.html');
+  }
+
+  async function shareDialog(eventId, eventTitle, boutId) {
+    injectCss();
+    var sb = window.__WDS_SUPABASE__;
+    if (!sb) return;
+    var bg = document.createElement('div');
+    bg.className = 'fs-share-bg';
+    bg.innerHTML = '<div class="fs-share" role="dialog" aria-label="Share the Strike Sheet"><h2>Share the Strike Sheet</h2><p>Loading…</p></div>';
+    document.body.appendChild(bg);
+    var box = bg.firstChild;
+    function draw(link, msg) {
+      var base = sheetPageUrl() + '#/t/' + link.token;
+      var boutUrl = boutId ? base + '/bout/' + encodeURIComponent(boutId) : null;
+      var until = new Date(link.expires_at).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      function row(label, url, key) {
+        return '<label>' + label + '</label><div class="fs-share-row"><input type="text" readonly value="' + esc(url) + '" data-url="' + key + '">' +
+          '<button type="button" class="fs-btn" data-copy="' + key + '">Copy</button></div>';
+      }
+      box.innerHTML = '<h2>Share the Strike Sheet</h2>' +
+        '<p>Anyone with this link can record strikes on ' + (eventTitle ? '<strong>' + esc(eventTitle) + '</strong>' : 'this event') +
+        '\u2019s bouts while they are live — no sign-in. It is the same sheet and the same tally as the Strike Sheet in ScoreHUB. Works until <strong>' + esc(until) + '</strong>.</p>' +
+        (boutUrl ? row('This bout — opens its sheet directly', boutUrl, 'bout') : '') +
+        row('Whole event — the recorder picks the bout', base, 'event') +
+        (msg ? '<p class="fs-share-msg">' + esc(msg) + '</p>' : '') +
+        '<div class="fs-share-acts"><button type="button" class="fs-btn" data-new>New link</button>' +
+        '<button type="button" class="fs-btn" data-off>Turn off link</button><span style="flex:1"></span>' +
+        '<button type="button" class="fs-btn" data-done>Done</button></div>' +
+        '<p class="fs-note">New link stops the old one working. Turn off link stops it until you share again.</p>';
+    }
+    async function load(renew) {
+      var r = await sb.rpc('strike_link_get', { p_event: eventId, p_new: !!renew });
+      if (r.error) { box.innerHTML = '<h2>Share the Strike Sheet</h2><p>' + esc(errMsg(r.error)) + '</p><div class="fs-share-acts"><span style="flex:1"></span><button type="button" class="fs-btn" data-done>Close</button></div>'; return; }
+      draw(r.data, renew ? 'New link made — the old one no longer works.' : '');
+    }
+    bg.addEventListener('click', async function (ev) {
+      var el = ev.target.closest('button');
+      if (ev.target === bg || (el && el.hasAttribute('data-done'))) { bg.remove(); return; }
+      if (!el) return;
+      if (el.hasAttribute('data-copy')) {
+        var input = box.querySelector('[data-url="' + el.getAttribute('data-copy') + '"]');
+        try { await navigator.clipboard.writeText(input.value); }
+        catch (e) { input.select(); try { document.execCommand('copy'); } catch (e2) { /* ignore */ } }
+        el.textContent = 'Copied'; setTimeout(function () { el.textContent = 'Copy'; }, 1500);
+      }
+      if (el.hasAttribute('data-new')) { el.disabled = true; await load(true); }
+      if (el.hasAttribute('data-off')) {
+        el.disabled = true;
+        var r = await sb.rpc('strike_link_revoke', { p_event: eventId });
+        box.innerHTML = '<h2>Share the Strike Sheet</h2><p>' + (r.error ? esc(errMsg(r.error)) : 'The link is turned off. Share again to make a new one.') + '</p>' +
+          '<div class="fs-share-acts"><span style="flex:1"></span><button type="button" class="fs-btn" data-done>Done</button></div>';
+      }
+    });
+    await load(false);
+  }
+
   // Small API for support / other scripts: ScoreHUBFightStats.open('<bout id>')
   window.ScoreHUBFightStats = {
     open: open, close: close, performance: performance, roundCard: roundCard, isOpen: function () { return !!S; },
-    injectCss: injectCss,
+    injectCss: injectCss, linkStore: linkStore, shareDialog: shareDialog,
     weights: W, rules: R,
   };
 })();

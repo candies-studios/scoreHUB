@@ -115,7 +115,7 @@
       if (/strike_sheet_bouts|list_stat_counters|bout_stat_counters/.test(m) && /exist|find/i.test(m)) {
         return 'The Strike Sheet is not set up in the database yet (run config/migrations/003_strike_sheet_and_rankings.sql).';
       }
-      if (e && e.code === '42501') return 'You do not have permission to do that.';
+      if (e && e.code === '42501') return /link/i.test(m) ? m : 'You do not have permission to do that.';
       return m;
     }
 
@@ -224,7 +224,9 @@
         groups[k].items.push(b);
       });
       var body = order.map(function (k) {
-        return '<div class="ss-event">' + esc(groups[k].title) + '</div>' + groups[k].items.map(boutCard).join('');
+        return '<div class="ss-event" style="display:flex;align-items:center;gap:.75rem">' + esc(groups[k].title) +
+          (isStaff() ? '<button class="fs-btn" data-share="' + esc(k) + '" style="padding:.25rem .75rem;font-size:.6875rem;letter-spacing:normal;text-transform:none">Share link</button>' : '') +
+          '</div>' + groups[k].items.map(boutCard).join('');
       }).join('');
       if (!bouts.length) {
         body = '<div class="ss-empty">' + (isStaff()
@@ -342,9 +344,76 @@
       if (!el) return;
       if (el.hasAttribute('data-open')) location.hash = '#/bout/' + encodeURIComponent(el.getAttribute('data-open'));
       if (el.hasAttribute('data-counters')) openCounters(el.getAttribute('data-counters'));
+      if (el.hasAttribute('data-lopen')) {
+        var t = (location.hash.match(/^#\/t\/([A-Za-z0-9]+)/) || [])[1];
+        if (t) location.hash = '#/t/' + t + '/bout/' + encodeURIComponent(el.getAttribute('data-lopen'));
+      }
+      if (el.hasAttribute('data-share') && FS) {
+        var ev0 = bouts.find(function (x) { return x.event_id === el.getAttribute('data-share'); });
+        FS.shareDialog(el.getAttribute('data-share'), ev0 ? ev0.event_title : '', null);
+      }
     });
 
+    // ---------------------------------------------------------------- share link (no sign-in)
+    var linkInfo = null;
+    function linkBoutCard(token, b) {
+      var live = b.status === 'LIVE';
+      var status = live ? 'Live · R' + Math.max(1, b.current_round || 1) : b.status === 'COMPLETED' ? 'Finished' : 'Not started';
+      return '<div class="ss-bout' + (live ? ' live' : '') + '">' +
+        '<div><h3>Bout ' + esc(b.bout_number) + (b.bout_name ? ' · ' + esc(b.bout_name) : '') + '</h3>' +
+        '<div class="vs"><span class="b">' + esc(b.blue_name || 'Blue corner') + '</span> vs <span class="r">' + esc(b.red_name || 'Red corner') + '</span></div>' +
+        '<div class="meta">' + esc(b.discipline) + ' · ' + esc(b.total_rounds) + ' rounds · <span class="fs-pill" style="padding:.125rem .5rem"><span class="fs-dot' + (live ? ' live' : '') + '"></span>' + esc(status) + '</span></div></div>' +
+        '<div class="acts"><button class="fs-btn" data-lopen="' + esc(b.id) + '"' + (live ? ' style="background-image:linear-gradient(90deg,#0b3fd4,#1580f5 55%,#29b6ff);border-color:transparent;color:#fff"' : '') + '>Open Strike Sheet</button></div></div>';
+    }
+    function renderLink(token, errMsg) {
+      if (errMsg && !linkInfo) {
+        app.innerHTML = '<div class="ss-auth"><div class="ss-brand">score<b>HUB</b></div><h1>Strike Sheet</h1><div class="fs-banner">' + esc(errMsg) + '</div></div>';
+        return;
+      }
+      var list = (linkInfo.bouts || []).slice().sort(function (a, b) { return (b.status === 'LIVE') - (a.status === 'LIVE'); });
+      var until = new Date(linkInfo.expires_at).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      app.innerHTML =
+        '<div class="ss-bar"><div class="ss-brand">score<b>HUB</b> <span style="font-weight:600;color:#94a3b8;font-size:.9375rem">Strike Sheet</span></div>' +
+        '<div class="grow"></div><div class="ss-who">Shared link · works until <strong>' + esc(until) + '</strong></div></div>' +
+        (errMsg ? '<div class="fs-banner">' + esc(errMsg) + '</div>' : '') +
+        '<div class="ss-event">' + esc(linkInfo.event_title) + '</div>' +
+        (list.length ? list.map(function (b) { return linkBoutCard(token, b); }).join('') : '<div class="ss-empty">No bouts on this card yet.</div>');
+    }
+    async function showLink(token) {
+      stopList();
+      async function load() {
+        var r = await sb.rpc('strike_link_info', { p_token: token });
+        if (r.error) throw r.error;
+        linkInfo = r.data;
+      }
+      try { await load(); renderLink(token); }
+      catch (e) { renderLink(token, friendly(e)); if (!linkInfo) return; }
+      listTimer = setInterval(async function () {
+        if (FS && FS.isOpen()) return;
+        try { await load(); renderLink(token); } catch (e) { renderLink(token, friendly(e)); }
+      }, 5000);
+    }
+
     async function route() {
+      var lm = (location.hash || '').match(/^#\/t\/([A-Za-z0-9]+)(?:\/bout\/([^/?#]+))?/);
+      if (lm) {
+        var token = lm[1];
+        if (lm[2]) {
+          stopList();
+          if (!FS) { app.textContent = 'fight-stats.js did not load.'; return; }
+          if (FS.isOpen()) FS.close();
+          app.innerHTML = '';
+          FS.open(decodeURIComponent(lm[2]), {
+            store: FS.linkStore(sb, token),
+            closeLabel: 'All bouts',
+            onClose: function () { if (/\/bout\//.test(location.hash)) location.hash = '#/t/' + token; },
+          });
+          return;
+        }
+        if (FS && FS.isOpen()) FS.close();
+        showLink(token);
+        return;
+      }
       if (!me) { renderSignIn(); return; }
       var m = (location.hash || '').match(/^#\/bout\/([^/?#]+)/);
       if (m) {
@@ -368,7 +437,9 @@
     (async function start() {
       if (!sb) { app.innerHTML = '<div class="ss-empty">Could not load the database client (vendor/supabase.js).</div>'; return; }
       app.innerHTML = '<div class="ss-empty">Loading…</div>';
-      try { me = await loadMe(); } catch (e) { me = null; }
+      if (!/^#\/t\//.test(location.hash || '')) {
+        try { me = await loadMe(); } catch (e) { me = null; }
+      }
       route();
     })();
   })();

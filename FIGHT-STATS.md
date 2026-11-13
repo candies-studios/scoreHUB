@@ -14,6 +14,7 @@ part of the **WDS ranking score**. The judges' cards still decide every bout.
 1. **Database.** Supabase → project **zxqaolyckzgaqohpiwtk** → SQL Editor. Run these in order:
    - `config/migrations/002_fight_stats.sql`
    - `config/migrations/003_strike_sheet_and_rankings.sql`
+   - `config/migrations/004_strike_sheet_links.sql`
 
    Both are safe to run again.
 2. **ScoreHUB repo** (`candies-studios/scoreHUB`), root folder: `index.html`,
@@ -37,6 +38,31 @@ becomes theirs.
 
 **Assigning counters:** on the Strike Sheet page, tap **Counters** on a bout and tick
 the people. You can assign someone before their first sign-in.
+
+## Share link (no sign-in on fight night)
+
+Management can share the Strike Sheet with someone who has no account. Tap
+**Share link** in either of these places:
+
+- on an event in the Strike Sheet page's bout list, or
+- in the top bar of any bout's sheet (the same button inside ScoreHUB).
+
+You get two links to copy and send (WhatsApp, SMS…):
+
+- **This bout**: `…/strike-sheet.html#/t/<code>/bout/<bout id>` opens that bout's sheet
+  directly.
+- **Whole event**: `…/strike-sheet.html#/t/<code>` lists the event's bouts, live ones
+  first, and the recorder taps one.
+
+The link opens **the same sheet as inside ScoreHUB** and records into **the same
+tally**. Taps from a link, from signed-in counters and from management all show on
+every screen within a couple of seconds. Like a counter, a link can record only
+while a bout is live. *Undo last* undoes that phone's own last tap.
+
+The link works until **06:00 IST the morning after the event** (at least 24 hours
+from when you made it). **New link** replaces it, so the old link stops working.
+**Turn off link** stops it straight away. Anyone holding the link can record, so
+share it only with your recorders.
 
 ## Getting to the sheet
 
@@ -116,6 +142,8 @@ Score = (Win% × 0.6 + Win Method Weight × 0.3 + Stats × 0.1) × √(total fig
 - `bout_stats`: one row per bout × round × corner (running totals and the control clock).
 - `bout_stat_events`: every tap (who, when, what), used for undo and audit.
 - `bout_stat_counters`: who counts on which bout (by email).
+- `strike_sheet_links`: share links (event, code, expiry, turned off). Taps made
+  through a link are logged with the phone's device id instead of an account.
 - `stat_score_weights`, `ranking_formula`: the editable weights.
 - `public_bout_stats`: public stats of finalized bouts (website).
 - `fighter_rankings.stats_score`, `bout_points.stats_share`: the stats part of the rankings.
